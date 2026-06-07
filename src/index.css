@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overscroll-behavior: none;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f0f9ff;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    min-height: 100%;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,0.1);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-700 hover:bg-primary-800 active:bg-primary-900 text-white font-semibold py-3 px-6 rounded-2xl transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed select-none;
+  }
+
+  .btn-secondary {
+    @apply bg-primary-50 hover:bg-primary-100 active:bg-primary-200 text-primary-700 font-semibold py-3 px-6 rounded-2xl transition-colors duration-150 select-none;
+  }
+
+  .btn-danger {
+    @apply bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-3 px-6 rounded-2xl transition-colors duration-150 select-none;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-slate-100 p-4;
+  }
+
+  .input-field {
+    @apply w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition;
+  }
+
+  .label {
+    @apply text-sm font-medium text-slate-600 mb-1 block;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .page-container {
+    @apply flex flex-col flex-1 overflow-y-auto pb-20;
+  }
+
+  .page-header {
+    @apply sticky top-0 z-10 bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .gradient-blue {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  }
+}
+
+/* Camera view specifics */
+.camera-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #0f172a;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.camera-container video,
+.camera-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-container canvas {
+  z-index: 2;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
