@@ -13,6 +13,8 @@ export interface Patient {
   affectedSide: 'left' | 'right' | 'both'
   email: string
   createdAt: Date
+  strokeType?: 'Hemoragik' | 'Iskemik'
+  strokeOnsetDate?: Date
 }
 
 export interface Session {
@@ -54,9 +56,11 @@ function fromDate(d: Date) {
 
 // ── Patient / Profile ──────────────────────────────────────
 export async function savePatientProfile(uid: string, data: Omit<Patient, 'id'>): Promise<void> {
+  const { strokeOnsetDate, ...rest } = data
   await setDoc(doc(firestore, 'users', uid), {
-    ...data,
-    createdAt: fromDate(data.createdAt)
+    ...rest,
+    createdAt: fromDate(data.createdAt),
+    ...(strokeOnsetDate ? { strokeOnsetDate: fromDate(strokeOnsetDate) } : {})
   })
 }
 
@@ -64,11 +68,20 @@ export async function getPatientProfile(uid: string): Promise<Patient | null> {
   const snap = await getDoc(doc(firestore, 'users', uid))
   if (!snap.exists()) return null
   const d = snap.data()
-  return { id: uid, ...d, createdAt: toDate(d.createdAt) } as Patient
+  return {
+    id: uid,
+    ...d,
+    createdAt: toDate(d.createdAt),
+    ...(d.strokeOnsetDate ? { strokeOnsetDate: toDate(d.strokeOnsetDate) } : {})
+  } as Patient
 }
 
 export async function updatePatientProfile(uid: string, updates: Partial<Omit<Patient, 'id'>>): Promise<void> {
-  await updateDoc(doc(firestore, 'users', uid), updates)
+  const { strokeOnsetDate, ...rest } = updates
+  await updateDoc(doc(firestore, 'users', uid), {
+    ...rest,
+    ...(strokeOnsetDate ? { strokeOnsetDate: fromDate(strokeOnsetDate) } : {})
+  })
 }
 
 // ── Sessions ───────────────────────────────────────────────

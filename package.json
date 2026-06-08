@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "server": "node server.js",
-    "dev:full": "concurrently \"npm run dev\" \"npm run server\""
+    "dev:full": "concurrently \"npm run dev\" \"npm run server\"",
+    "rapi": "C:/PROGRA~1/R/R-46~1.0/bin/Rscript.exe RUN_API.R"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.14",

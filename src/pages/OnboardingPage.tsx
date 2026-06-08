@@ -10,7 +10,9 @@ export default function OnboardingPage() {
     name: '',
     age: '',
     gender: 'male' as 'male' | 'female',
-    affectedSide: 'right' as 'left' | 'right' | 'both'
+    affectedSide: 'right' as 'left' | 'right' | 'both',
+    strokeType: 'Iskemik' as 'Hemoragik' | 'Iskemik',
+    strokeOnsetDate: ''
   })
   const [saving, setSaving] = useState(false)
   const { setCurrentPatient } = useAppStore()
@@ -20,11 +22,14 @@ export default function OnboardingPage() {
     const email = auth.currentUser?.email ?? ''
     if (!form.name || !form.age || !uid) return
     setSaving(true)
+    const [y, m, d] = form.strokeOnsetDate ? form.strokeOnsetDate.split('-').map(Number) : []
     await savePatientProfile(uid, {
       name: form.name.trim(),
       age: parseInt(form.age),
       gender: form.gender,
       affectedSide: form.affectedSide,
+      strokeType: form.strokeType,
+      ...(form.strokeOnsetDate ? { strokeOnsetDate: new Date(y, m - 1, d) } : {}),
       email,
       createdAt: new Date()
     })
@@ -142,6 +147,37 @@ export default function OnboardingPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label className="label">Jenis Stroke</label>
+          <div className="grid grid-cols-2 gap-3">
+            {(['Iskemik', 'Hemoragik'] as const).map(t => (
+              <button
+                key={t}
+                className={`py-3 rounded-xl border-2 font-medium transition-colors text-sm ${
+                  form.strokeType === t
+                    ? 'border-primary-600 bg-primary-50 text-primary-700'
+                    : 'border-slate-200 text-slate-600'
+                }`}
+                onClick={() => setForm(f => ({ ...f, strokeType: t }))}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Tanggal Onset Stroke <span className="text-slate-400 font-normal">(opsional)</span></label>
+          <input
+            className="input-field"
+            type="date"
+            max={new Date().toISOString().split('T')[0]}
+            value={form.strokeOnsetDate}
+            onChange={e => setForm(f => ({ ...f, strokeOnsetDate: e.target.value }))}
+          />
+          <p className="text-xs text-slate-400 mt-1">Diperlukan untuk fitur prediksi pemulihan</p>
         </div>
       </div>
 

@@ -1,1 +1,7 @@
 node_modules
+dist
+dev-dist
+output
+.env
+.env.local
+.env.*.local

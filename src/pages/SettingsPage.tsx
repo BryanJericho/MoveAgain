@@ -12,7 +12,11 @@ export default function SettingsPage() {
     name: currentPatient?.name ?? '',
     age: String(currentPatient?.age ?? ''),
     gender: (currentPatient?.gender ?? 'male') as 'male' | 'female',
-    affectedSide: (currentPatient?.affectedSide ?? 'right') as 'left' | 'right' | 'both'
+    affectedSide: (currentPatient?.affectedSide ?? 'right') as 'left' | 'right' | 'both',
+    strokeType: (currentPatient?.strokeType ?? 'Iskemik') as 'Hemoragik' | 'Iskemik',
+    strokeOnsetDate: currentPatient?.strokeOnsetDate
+      ? new Date(currentPatient.strokeOnsetDate).toISOString().split('T')[0]
+      : ''
   })
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -22,11 +26,14 @@ export default function SettingsPage() {
   async function saveProfile() {
     if (!form.name || !form.age || !currentPatient?.id) return
     setSaving(true)
+    const [y, m, d] = form.strokeOnsetDate ? form.strokeOnsetDate.split('-').map(Number) : []
     const updates = {
       name: form.name.trim(),
       age: parseInt(form.age),
       gender: form.gender,
-      affectedSide: form.affectedSide
+      affectedSide: form.affectedSide,
+      strokeType: form.strokeType,
+      ...(form.strokeOnsetDate ? { strokeOnsetDate: new Date(y, m - 1, d) } : {})
     }
     await updatePatientProfile(currentPatient.id, updates)
     updatePatient(updates)
@@ -113,7 +120,11 @@ export default function SettingsPage() {
                 ['Nama', currentPatient?.name],
                 ['Usia', `${currentPatient?.age} tahun`],
                 ['Jenis Kelamin', currentPatient?.gender === 'male' ? 'Laki-laki' : 'Perempuan'],
-                ['Sisi Terdampak', { left: 'Kiri', right: 'Kanan', both: 'Keduanya' }[currentPatient?.affectedSide ?? 'right']]
+                ['Sisi Terdampak', { left: 'Kiri', right: 'Kanan', both: 'Keduanya' }[currentPatient?.affectedSide ?? 'right']],
+                ['Jenis Stroke', currentPatient?.strokeType ?? '-'],
+                ['Onset Stroke', currentPatient?.strokeOnsetDate
+                  ? new Date(currentPatient.strokeOnsetDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                  : '-']
               ].map(([label, value]) => (
                 <div key={label as string} className="flex justify-between items-center py-1.5 border-b border-slate-50 last:border-0">
                   <span className="text-sm text-slate-500">{label}</span>
@@ -150,6 +161,26 @@ export default function SettingsPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+              <div>
+                <label className="label">Jenis Stroke</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['Iskemik', 'Hemoragik'] as const).map(t => (
+                    <button key={t} className={`py-2.5 rounded-xl border-2 text-sm font-medium transition-colors ${form.strokeType === t ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 text-slate-600'}`} onClick={() => setForm(f => ({ ...f, strokeType: t }))}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="label">Tanggal Onset Stroke</label>
+                <input
+                  className="input-field"
+                  type="date"
+                  max={new Date().toISOString().split('T')[0]}
+                  value={form.strokeOnsetDate}
+                  onChange={e => setForm(f => ({ ...f, strokeOnsetDate: e.target.value }))}
+                />
               </div>
               <button className="btn-primary w-full flex items-center justify-center gap-2" onClick={saveProfile} disabled={saving}>
                 <Save size={16} /> {saving ? 'Menyimpan...' : 'Simpan Perubahan'}

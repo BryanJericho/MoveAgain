@@ -6,6 +6,7 @@ import { getExerciseById, ALL_EXERCISES } from '../lib/exercises'
 import ROMChart from '../components/ROMChart'
 import RepsChart from '../components/RepsChart'
 import SessionSamplesChart from '../components/SessionSamplesChart'
+import RecoveryPredictionCard from '../components/RecoveryPredictionCard'
 
 function formatDate(d: Date | string) {
   return new Date(d).toLocaleDateString('id-ID', {
@@ -123,6 +124,11 @@ export default function HistoryPage() {
                 </div>
               ))}
             </div>
+
+            {/* Recovery prediction */}
+            {currentPatient && (
+              <RecoveryPredictionCard sessions={sessions} patient={currentPatient} />
+            )}
 
             {/* Charts section */}
             {filtered.length >= 2 && (
