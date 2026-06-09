@@ -1,7 +1,12 @@
 node_modules
 dist
 dev-dist
-output
+# Model asli terlalu besar dan berisi data simulasi lokal
+output/simulasi_data.RData
+output/survival_weibull_fit.rds
+# File deployment ringan DIIZINKAN masuk git (dibutuhkan Railway/Render)
+# output/post_samp.rds   ← masuk git setelah prepare_deployment.R dijalankan
+# output/fpca_ref.rds    ← masuk git setelah prepare_deployment.R dijalankan
 .env
 .env.local
 .env.*.local

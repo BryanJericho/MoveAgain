@@ -1,0 +1,24 @@
+node_modules
+dist
+dev-dist
+src
+public
+.git
+.github
+.vscode
+*.md
+package.json
+package-lock.json
+vite.config.ts
+tailwind.config.js
+tsconfig.json
+index.html
+.env*
+*.log
+
+# Model asli tidak diperlukan di Docker (sudah diekstrak ke post_samp.rds)
+output/simulasi_data.RData
+output/survival_weibull_fit.rds
+
+# Script lokal tidak diperlukan
+prepare_deployment.R

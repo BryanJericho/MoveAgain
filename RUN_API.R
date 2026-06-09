@@ -1,40 +1,41 @@
 # =============================================================
-# RUN_API.R - Menjalankan Server Plumber API Prediksi Pemulihan
+# RUN_API.R - Menjalankan Server Plumber
 # =============================================================
-# Jalankan via npm: npm run rapi
-# atau langsung:   Rscript d:/SEC-Stroke/RUN_API.R
-
-if (!requireNamespace("plumber", quietly = TRUE)) {
-  cat("Menginstal package 'plumber'...\n")
-  install.packages("plumber", repos = "https://cran.r-project.org")
-}
+# Lokal  : npm run rapi   (atau Rscript RUN_API.R)
+# Docker : dijalankan otomatis oleh CMD di Dockerfile
+# =============================================================
 
 library(plumber)
 
-# Set working directory ke folder project agar path output/ ditemukan
-setwd("d:/SEC-Stroke")
-cat("Working directory:", getwd(), "\n")
+# Di lokal: set working directory ke folder project
+# Di Docker/Railway: PORT sudah diset, skip setwd
+if (nchar(Sys.getenv("PORT")) == 0) {
+  setwd("d:/SEC-Stroke")
+  cat("Working directory:", getwd(), "\n")
+}
 
-# Cek file yang dibutuhkan
-required_files <- c("API_plumber.R", "output/simulasi_data.RData", "output/survival_weibull_fit.rds")
-missing <- required_files[!file.exists(required_files)]
-if (length(missing) > 0) {
-  cat("\nERROR: File berikut tidak ditemukan:\n")
-  for (f in missing) cat("  -", normalizePath(f, mustWork = FALSE), "\n")
-  cat("\nPastikan API_plumber.R dan folder output/ ada di d:/SEC-Stroke/\n")
-  stop("File tidak lengkap")
+# Validasi file yang dibutuhkan
+has_prod <- file.exists("output/post_samp.rds") && file.exists("output/fpca_ref.rds")
+has_dev  <- file.exists("output/survival_weibull_fit.rds") && file.exists("output/simulasi_data.RData")
+
+if (!has_prod && !has_dev) {
+  stop(paste(
+    "\nERROR: Tidak ada file model yang ditemukan di output/",
+    "Untuk produksi  : jalankan prepare_deployment.R terlebih dahulu",
+    "Untuk lokal     : pastikan output/survival_weibull_fit.rds ada",
+    sep = "\n"
+  ))
 }
 
 cat("========================================================\n")
-cat(" Menyiapkan Server R Plumber API...\n")
-cat(" (Memuat model dari output/ ...)\n")
+cat(if (has_prod) " Mode: PRODUKSI (file ringan)\n" else " Mode: LOKAL (model brms penuh)\n")
 cat("========================================================\n")
 
 pr <- pr("API_plumber.R")
 
-cat("\n========================================================\n")
-cat(" Server Berjalan di http://127.0.0.1:8000\n")
-cat(" Dokumentasi: http://127.0.0.1:8000/__docs__/\n")
-cat("========================================================\n")
+port <- as.integer(Sys.getenv("PORT", "8000"))
+host <- "0.0.0.0"
+cat(sprintf("\n Server berjalan di http://%s:%d\n", host, port))
+cat(sprintf(" Dokumentasi  : http://%s:%d/__docs__/\n\n", host, port))
 
-pr_run(pr, host = "0.0.0.0", port = 8000)
+pr_run(pr, host = host, port = port)
