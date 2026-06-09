@@ -1,26 +1,24 @@
 # =============================================================
 # Dockerfile — R Plumber API (tanpa brms/Stan)
 # =============================================================
-# Image ringan ~600MB karena hanya butuh plumber + fda.
-# Jalankan prepare_deployment.R lokal dulu sebelum build.
-# =============================================================
 
 FROM rocker/r-ver:4.4
 
-# System dependencies untuk plumber (curl, openssl)
+# System libraries yang dibutuhkan plumber dan fda
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
+    libsodium-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install R packages — fda adalah pure R, plumber ringan
-RUN R -e "install.packages(c('plumber', 'fda', 'jsonlite'), \
-          repos='https://cran.r-project.org', quiet=TRUE)"
+# install2.r dari littler: keluar dengan error code jika package gagal install
+# --error  = fail hard on error (berbeda dengan install.packages yang diam-diam gagal)
+# --ncpus -1 = pakai semua CPU yang tersedia (lebih cepat)
+RUN install2.r --error --ncpus -1 plumber fda jsonlite
 
 WORKDIR /app
 
-# Hanya salin file yang diperlukan (bukan node_modules, src, dll)
 COPY API_plumber.R  .
 COPY RUN_API.R      .
 COPY output/post_samp.rds  output/
