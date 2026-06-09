@@ -1,9 +1,5 @@
 # Move Again — Post-Stroke Rehabilitation PWA
 
-> **Prompt untuk Claude.ai:** Tolong kembangkan README ini menjadi dokumentasi teknis lengkap dan profesional dalam Bahasa Indonesia. Tambahkan: diagram arsitektur sistem (ASCII/Mermaid), flowchart pipeline data, visualisasi formula matematika (LaTeX), tabel perbandingan metode, dan gambar ilustratif untuk setiap bagian metode. Pertahankan semua referensi jurnal yang ada dan tambahkan referensi relevan lainnya.
-
----
-
 ## Deskripsi Singkat
 
 **Move Again** adalah aplikasi web progresif (PWA) berbasis *computer vision* untuk pemantauan rehabilitasi pasca-stroke secara mandiri. Tanpa alat tambahan, pasien dapat mengukur *Range of Motion* (ROM) sendi secara real-time menggunakan kamera smartphone, melacak progres harian, dan mendapatkan prediksi waktu pemulihan berbasis model statistik Bayesian yang dilatih dari data klinis.
