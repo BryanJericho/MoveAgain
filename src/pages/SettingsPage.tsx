@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Settings, User, Key, Trash2, Save, AlertTriangle, LogOut } from 'lucide-react'
+import { Settings, User, Key, Trash2, Save, AlertTriangle, LogOut, Volume2 } from 'lucide-react'
+import { isAudioEnabled, setAudioEnabled } from '../lib/audio'
 import { signOut } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { useAppStore } from '../store/useAppStore'
@@ -18,6 +19,7 @@ export default function SettingsPage() {
       ? new Date(currentPatient.strokeOnsetDate).toISOString().split('T')[0]
       : ''
   })
+  const [audioOn, setAudioOn] = useState(isAudioEnabled)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -185,6 +187,36 @@ export default function SettingsPage() {
               <button className="btn-primary w-full flex items-center justify-center gap-2" onClick={saveProfile} disabled={saving}>
                 <Save size={16} /> {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* Audio settings */}
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Volume2 size={18} className="text-primary-600" />
+              <div>
+                <h2 className="font-semibold text-slate-700">Panduan Suara</h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Hitung repetisi & motivasi saat latihan
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => { const v = !audioOn; setAudioOn(v); setAudioEnabled(v) }}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${audioOn ? 'bg-primary-600' : 'bg-slate-200'}`}
+              aria-label={audioOn ? 'Nonaktifkan suara' : 'Aktifkan suara'}
+            >
+              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${audioOn ? 'left-6' : 'left-0.5'}`} />
+            </button>
+          </div>
+          {audioOn && (
+            <div className="mt-3 bg-primary-50 rounded-xl p-3 text-xs text-primary-700 space-y-1 leading-relaxed">
+              <p>🔢 Menghitung rep dengan suara: "Satu", "Dua"…</p>
+              <p>🎉 Dorongan setiap 5 rep: "Lima! Bagus sekali."</p>
+              <p>📷 Peringatan bila pose tidak terdeteksi</p>
+              <p>✅ "Latihan selesai. X repetisi. Kerja bagus!"</p>
             </div>
           )}
         </div>

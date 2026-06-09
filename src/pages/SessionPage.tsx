@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronLeft, Play, Square, CheckCircle2, FlipHorizontal } from 'lucide-react'
+import { ChevronLeft, Play, Square, CheckCircle2, FlipHorizontal, Volume2, VolumeX } from 'lucide-react'
+import {
+  isAudioEnabled, setAudioEnabled,
+  announceRep, announceSessionStart, announceSessionEnd,
+  warnNoDetection, resetWarnThrottle,
+} from '../lib/audio'
 import { useAppStore } from '../store/useAppStore'
 import { addSession } from '../lib/db'
 import {
@@ -59,6 +64,7 @@ export default function SessionPage() {
   const [elapsedSec, setElapsedSec] = useState(0)
   const [facingUser, setFacingUser] = useState(true)
   const [result, setResult] = useState<SessionResult | null>(null)
+  const [audioOn, setAudioOn] = useState(isAudioEnabled)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -172,7 +178,7 @@ export default function SessionPage() {
                 validFramesRef.current++
                 const { newState, repCompleted } = updateRepState(angle, repStateRef.current)
                 repStateRef.current = newState
-                if (repCompleted) { repsRef.current++; setReps(repsRef.current) }
+                if (repCompleted) { repsRef.current++; setReps(repsRef.current); announceRep(repsRef.current) }
               }
             }
           } else {
@@ -236,6 +242,13 @@ export default function SessionPage() {
   }, [appState, detectionLoop])
 
   useEffect(() => () => stopCamera(), [])
+
+  // Warn patient via audio when pose is lost during an active recording
+  useEffect(() => {
+    if (appState !== 'recording' || detected) return
+    const t = setTimeout(() => { if (!detected) warnNoDetection() }, 3000)
+    return () => clearTimeout(t)
+  }, [detected, appState])
 
   // ── Exercise selection → show tutorial & load model in bg ─
   async function handleExerciseSelect(exercise: ExerciseConfig) {
@@ -307,10 +320,12 @@ export default function SessionPage() {
     repStateRef.current = INITIAL_REP_STATE
     smoothAngleRef.current = 0
     startTimeRef.current = new Date()
+    resetWarnThrottle()
     setReps(0)
     setElapsedSec(0)
     setAppState('recording')  // loop keeps running — no restart needed
     timerRef.current = setInterval(() => setElapsedSec(s => s + 1), 1000)
+    announceSessionStart(selectedExercise?.nameShort)
   }
 
   async function stopRecording() {
@@ -319,6 +334,7 @@ export default function SessionPage() {
     const ex = selectedExercise
 
     if (!angles.length || !ex || !currentPatient?.id) {
+      announceSessionEnd(0)
       setResult({ maxRom: 0, avgRom: 0, minRom: 0, repCount: 0, validFrames: 0, durationSec: elapsedSec })
       setAppState('done')
       stopCamera()
@@ -336,6 +352,7 @@ export default function SessionPage() {
       durationSec: elapsedSec,
       romSamples
     }
+    announceSessionEnd(repsRef.current)
     setResult(r)
     setAppState('done')
     stopCamera()
@@ -536,13 +553,24 @@ export default function SessionPage() {
             <p className="text-orange-400 text-xs font-bold animate-pulse-slow">⏱ {formatTime(elapsedSec)}</p>
           )}
         </div>
-        <button
-          className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center"
-          onClick={flipCamera}
-          title="Ganti kamera"
-        >
-          <FlipHorizontal size={18} color="white" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${audioOn ? 'bg-white/10' : 'bg-white/5'}`}
+            onClick={() => { const v = !audioOn; setAudioOn(v); setAudioEnabled(v) }}
+            title={audioOn ? 'Matikan suara' : 'Aktifkan suara'}
+          >
+            {audioOn
+              ? <Volume2 size={18} color="white" />
+              : <VolumeX size={18} color="rgba(255,255,255,0.4)" />}
+          </button>
+          <button
+            className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center"
+            onClick={flipCamera}
+            title="Ganti kamera"
+          >
+            <FlipHorizontal size={18} color="white" />
+          </button>
+        </div>
       </div>
 
       {/* Camera */}
