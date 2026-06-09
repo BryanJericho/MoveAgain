@@ -18,6 +18,7 @@ import {
 } from '../lib/exercises'
 import ExerciseGuide from '../components/ExerciseGuide'
 import SessionSamplesChart from '../components/SessionSamplesChart'
+import ModelLoadingScreen from '../components/ModelLoadingScreen'
 
 type AppState = 'select' | 'tutorial' | 'loading' | 'preview' | 'recording' | 'done'
 
@@ -77,6 +78,8 @@ export default function SessionPage() {
   const anglesRef = useRef<number[]>([])
   const validFramesRef = useRef(0)
   const startTimeRef = useRef<Date | null>(null)
+  const sessionMinRef = useRef<number>(Infinity)
+  const sessionMaxRef = useRef<number>(0)
 
   // Keep refs in sync on every render
   appStateRef.current = appState
@@ -168,7 +171,9 @@ export default function SessionPage() {
                 lastSampleTimeRef.current = now
                 anglesRef.current.push(angle)
                 validFramesRef.current++
-                const { newState, repCompleted } = updateRepState(angle, repStateRef.current, ex.normalRange[1])
+                sessionMinRef.current = Math.min(sessionMinRef.current, angle)
+                sessionMaxRef.current = Math.max(sessionMaxRef.current, angle)
+                const { newState, repCompleted } = updateRepState(angle, repStateRef.current, sessionMinRef.current, sessionMaxRef.current)
                 repStateRef.current = newState
                 if (repCompleted) { repsRef.current++; setReps(repsRef.current) }
               }
@@ -194,7 +199,9 @@ export default function SessionPage() {
               lastSampleTimeRef.current = now
               anglesRef.current.push(angle)
               validFramesRef.current++
-              const { newState, repCompleted } = updateRepState(angle, repStateRef.current, ex.normalRange[1])
+              sessionMinRef.current = Math.min(sessionMinRef.current, angle)
+              sessionMaxRef.current = Math.max(sessionMaxRef.current, angle)
+              const { newState, repCompleted } = updateRepState(angle, repStateRef.current, sessionMinRef.current, sessionMaxRef.current)
               repStateRef.current = newState
               if (repCompleted) { repsRef.current++; setReps(repsRef.current) }
             }
@@ -304,6 +311,8 @@ export default function SessionPage() {
     repsRef.current = 0
     repStateRef.current = 'idle'
     smoothAngleRef.current = 0
+    sessionMinRef.current = Infinity
+    sessionMaxRef.current = 0
     startTimeRef.current = new Date()
     setReps(0)
     setElapsedSec(0)
@@ -444,17 +453,7 @@ export default function SessionPage() {
 
   // ── LOADING ───────────────────────────────────────────────
   if (appState === 'loading') {
-    return (
-      <div className="flex flex-col flex-1 min-h-0 items-center justify-center gap-5 bg-white p-6">
-        <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-        <div className="text-center">
-          <p className="font-bold text-slate-700">Memuat Model AI…</p>
-          <p className="text-sm text-slate-500 mt-1">
-            Pertama kali sekitar 10–20 detik. Berikutnya akan instan.
-          </p>
-        </div>
-      </div>
-    )
+    return <ModelLoadingScreen />
   }
 
   // ── DONE ──────────────────────────────────────────────────

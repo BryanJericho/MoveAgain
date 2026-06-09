@@ -26,10 +26,20 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // Cache local model + WASM files in service worker
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,wasm,task}'],
-        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024, // 15MB for model files
+        // Jangan precache WASM/model — terlalu besar (46MB), gagal di HP
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
+          {
+            // WASM + model files: cache on-demand setelah pertama kali diload
+            urlPattern: /\.(wasm|task)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'mediapipe-assets',
+              expiration: { maxEntries: 10, maxAgeSeconds: 365 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com/,
             handler: 'StaleWhileRevalidate',

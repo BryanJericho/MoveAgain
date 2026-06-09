@@ -52,10 +52,16 @@ export interface RepResult {
 export function updateRepState(
   angle: number,
   state: RepState,
-  maxRom: number
+  sessionMin: number,
+  sessionMax: number
 ): RepResult {
-  const highThreshold = maxRom * 0.65
-  const lowThreshold = maxRom * 0.25
+  const range = sessionMax - sessionMin
+
+  // Butuh minimal 8° gerakan sebelum mulai hitung rep (filter noise)
+  if (range < 8) return { newState: state, repCompleted: false }
+
+  const highThreshold = sessionMin + range * 0.75
+  const lowThreshold  = sessionMin + range * 0.25
 
   if (state === 'idle' || state === 'low') {
     if (angle >= highThreshold) {

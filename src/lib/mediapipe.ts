@@ -70,6 +70,15 @@ export function initHandLandmarker(): Promise<HandLandmarker> {
   return _handPromise
 }
 
+export function preloadModels(): void {
+  initPoseLandmarker().catch(() => {})
+  initHandLandmarker().catch(() => {})
+}
+
+export function isModelReady(mode: 'body' | 'hand'): boolean {
+  return mode === 'body' ? _posePromise !== null : _handPromise !== null
+}
+
 export function drawPoseOverlay(
   ctx: CanvasRenderingContext2D,
   result: PoseLandmarkerResult,

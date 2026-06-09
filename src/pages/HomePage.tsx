@@ -4,6 +4,7 @@ import { TrendingUp, Award, Flame, ChevronRight } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import { getRecentSessions, type Session } from '../lib/db'
 import { getExerciseById } from '../lib/exercises'
+import { preloadModels } from '../lib/mediapipe'
 
 interface Stats {
   totalSessions: number
@@ -35,6 +36,8 @@ export default function HomePage() {
   const navigate = useNavigate()
   const { currentPatient } = useAppStore()
   const [stats, setStats] = useState<Stats | null>(null)
+
+  useEffect(() => { preloadModels() }, [])
 
   useEffect(() => {
     if (!currentPatient?.id) return
