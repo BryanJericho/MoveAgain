@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { Mail, Lock, Eye, EyeOff, Activity, BarChart2, Bot } from 'lucide-react'
@@ -51,18 +52,23 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
-  async function handleGoogle() {
+  // Tangkap error jika redirect Google gagal (sukses ditangani otomatis oleh onAuthStateChanged)
+  useEffect(() => {
+    getRedirectResult(auth).catch(err => {
+      const code = (err as { code?: string }).code ?? ''
+      if (code) setError(FIREBASE_ERRORS[code] ?? 'Login Google gagal. Coba lagi.')
+    })
+  }, [])
+
+  function handleGoogle() {
     setError(null)
     setGoogleLoading(true)
-    try {
-      await signInWithPopup(auth, new GoogleAuthProvider())
-    } catch (err) {
+    // signInWithRedirect lebih reliable di PWA/mobile daripada popup
+    signInWithRedirect(auth, new GoogleAuthProvider()).catch(err => {
       const code = (err as { code?: string }).code ?? ''
-      if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
-        setError(FIREBASE_ERRORS[code] ?? 'Login Google gagal. Coba lagi.')
-      }
-    }
-    setGoogleLoading(false)
+      setError(FIREBASE_ERRORS[code] ?? 'Login Google gagal. Coba lagi.')
+      setGoogleLoading(false)
+    })
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -212,7 +218,7 @@ export default function AuthPage() {
             )
           }
           <span className="text-sm font-semibold text-slate-700">
-            {googleLoading ? 'Menghubungkan…' : 'Lanjutkan dengan Google'}
+            {googleLoading ? 'Mengalihkan ke Google…' : 'Lanjutkan dengan Google'}
           </span>
         </button>
 

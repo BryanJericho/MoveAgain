@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Settings, User, Key, Trash2, Save, AlertTriangle, LogOut, Volume2 } from 'lucide-react'
+import { Settings, User, Trash2, Save, AlertTriangle, LogOut, Volume2 } from 'lucide-react'
 import { isAudioEnabled, setAudioEnabled } from '../lib/audio'
 import { signOut } from 'firebase/auth'
 import { auth } from '../lib/firebase'
@@ -7,7 +7,7 @@ import { useAppStore } from '../store/useAppStore'
 import { updatePatientProfile, clearUserData } from '../lib/db'
 
 export default function SettingsPage() {
-  const { currentPatient, setCurrentPatient, updatePatient, apiKeyConfigured, setApiKeyConfigured } = useAppStore()
+  const { currentPatient, setCurrentPatient, updatePatient } = useAppStore()
   const [editingProfile, setEditingProfile] = useState(false)
   const [form, setForm] = useState({
     name: currentPatient?.name ?? '',
@@ -23,7 +23,6 @@ export default function SettingsPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [checkingApi, setCheckingApi] = useState(false)
 
   async function saveProfile() {
     if (!form.name || !form.age || !currentPatient?.id) return
@@ -43,17 +42,6 @@ export default function SettingsPage() {
     setSaved(true)
     setEditingProfile(false)
     setTimeout(() => setSaved(false), 2000)
-  }
-
-  async function checkApiConnection() {
-    setCheckingApi(true)
-    try {
-      const res = await fetch('/api/health')
-      setApiKeyConfigured(res.ok)
-    } catch {
-      setApiKeyConfigured(false)
-    }
-    setCheckingApi(false)
   }
 
   async function handleLogout() {
@@ -221,32 +209,6 @@ export default function SettingsPage() {
           )}
         </div>
 
-        {/* API / Server status */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-3">
-            <Key size={18} className="text-primary-600" />
-            <h2 className="font-semibold text-slate-700">Chatbot AI</h2>
-          </div>
-          <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-            Chatbot membutuhkan server backend. Jalankan{' '}
-            <code className="bg-slate-100 px-1 rounded font-mono">npm run server</code> setelah mengatur{' '}
-            <code className="bg-slate-100 px-1 rounded font-mono">ANTHROPIC_API_KEY</code> di file{' '}
-            <code className="bg-slate-100 px-1 rounded font-mono">.env.local</code>.
-          </p>
-          <div className="flex items-center gap-2">
-            <div className={`flex items-center gap-1.5 text-sm font-medium ${apiKeyConfigured ? 'text-green-600' : 'text-red-500'}`}>
-              <div className={`w-2 h-2 rounded-full ${apiKeyConfigured ? 'bg-green-500' : 'bg-red-400'}`} />
-              {apiKeyConfigured ? 'Server aktif' : 'Server tidak aktif'}
-            </div>
-            <button
-              className="ml-auto text-xs text-primary-600 font-semibold bg-primary-50 px-3 py-1.5 rounded-xl"
-              onClick={checkApiConnection}
-              disabled={checkingApi}
-            >
-              {checkingApi ? 'Memeriksa...' : 'Cek Koneksi'}
-            </button>
-          </div>
-        </div>
 
         {/* About */}
         <div className="card">
@@ -257,7 +219,7 @@ export default function SettingsPage() {
               ['Database', 'Firebase Firestore'],
               ['Auth', 'Firebase Authentication'],
               ['Pose Engine', 'MediaPipe Tasks Vision'],
-              ['AI Chatbot', 'Claude (Anthropic)'],
+              ['AI Chatbot', 'Gemini 2.5 Flash'],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between">
                 <span className="text-slate-500">{k}</span>
