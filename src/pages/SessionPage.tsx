@@ -11,7 +11,8 @@ import {
 import type { PoseLandmarker, HandLandmarker } from '@mediapipe/tasks-vision'
 import {
   calculateAngle, getVisibilityScore, applyLowPassFilter,
-  updateRepState, getRomPercentage, getRomColor, type RepState
+  updateRepState, getRomPercentage, getRomColor,
+  INITIAL_REP_STATE, type RepState
 } from '../lib/rom'
 import {
   BODY_EXERCISES, HAND_EXERCISES, type ExerciseConfig, type ExerciseMode
@@ -72,14 +73,12 @@ export default function SessionPage() {
   const exerciseRef = useRef<ExerciseConfig | null>(null)
   const lastVideoTimeRef = useRef(-1)
   const lastSampleTimeRef = useRef(0)
-  const repStateRef = useRef<RepState>('idle')
+  const repStateRef = useRef<RepState>(INITIAL_REP_STATE)
   const repsRef = useRef(0)
   const smoothAngleRef = useRef(0)
   const anglesRef = useRef<number[]>([])
   const validFramesRef = useRef(0)
   const startTimeRef = useRef<Date | null>(null)
-  const sessionMinRef = useRef<number>(Infinity)
-  const sessionMaxRef = useRef<number>(0)
 
   // Keep refs in sync on every render
   appStateRef.current = appState
@@ -171,9 +170,7 @@ export default function SessionPage() {
                 lastSampleTimeRef.current = now
                 anglesRef.current.push(angle)
                 validFramesRef.current++
-                sessionMinRef.current = Math.min(sessionMinRef.current, angle)
-                sessionMaxRef.current = Math.max(sessionMaxRef.current, angle)
-                const { newState, repCompleted } = updateRepState(angle, repStateRef.current, sessionMinRef.current, sessionMaxRef.current)
+                const { newState, repCompleted } = updateRepState(angle, repStateRef.current)
                 repStateRef.current = newState
                 if (repCompleted) { repsRef.current++; setReps(repsRef.current) }
               }
@@ -199,9 +196,7 @@ export default function SessionPage() {
               lastSampleTimeRef.current = now
               anglesRef.current.push(angle)
               validFramesRef.current++
-              sessionMinRef.current = Math.min(sessionMinRef.current, angle)
-              sessionMaxRef.current = Math.max(sessionMaxRef.current, angle)
-              const { newState, repCompleted } = updateRepState(angle, repStateRef.current, sessionMinRef.current, sessionMaxRef.current)
+              const { newState, repCompleted } = updateRepState(angle, repStateRef.current)
               repStateRef.current = newState
               if (repCompleted) { repsRef.current++; setReps(repsRef.current) }
             }
@@ -309,10 +304,8 @@ export default function SessionPage() {
     anglesRef.current = []
     validFramesRef.current = 0
     repsRef.current = 0
-    repStateRef.current = 'idle'
+    repStateRef.current = INITIAL_REP_STATE
     smoothAngleRef.current = 0
-    sessionMinRef.current = Infinity
-    sessionMaxRef.current = 0
     startTimeRef.current = new Date()
     setReps(0)
     setElapsedSec(0)

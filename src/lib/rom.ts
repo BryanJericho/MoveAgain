@@ -42,37 +42,52 @@ export function applyLowPassFilter(prev: number, current: number, alpha = 0.3): 
   return alpha * current + (1 - alpha) * prev
 }
 
-export type RepState = 'idle' | 'high' | 'low'
+// Rep counter using local peak-valley detection.
+// Each rep = one meaningful oscillation (up then down, or down then up),
+// measured from the most recent turning point — not global session extremes.
+// This works for any ROM zone: red, orange, or green.
+
+export interface RepState {
+  phase: 'idle' | 'rising' | 'falling'
+  localPeak: number
+  localValley: number
+}
+
+export const INITIAL_REP_STATE: RepState = { phase: 'idle', localPeak: 0, localValley: 0 }
 
 export interface RepResult {
   newState: RepState
   repCompleted: boolean
 }
 
-export function updateRepState(
-  angle: number,
-  state: RepState,
-  sessionMin: number,
-  sessionMax: number
-): RepResult {
-  const range = sessionMax - sessionMin
+const MIN_AMPLITUDE = 8  // minimum degrees peak-to-valley to count as a rep
+const HYSTERESIS    = 4  // degrees of confirmed reversal before changing direction
 
-  // Butuh minimal 8° gerakan sebelum mulai hitung rep (filter noise)
-  if (range < 8) return { newState: state, repCompleted: false }
+export function updateRepState(angle: number, state: RepState): RepResult {
+  const { phase, localPeak, localValley } = state
 
-  const highThreshold = sessionMin + range * 0.75
-  const lowThreshold  = sessionMin + range * 0.25
-
-  if (state === 'idle' || state === 'low') {
-    if (angle >= highThreshold) {
-      return { newState: 'high', repCompleted: false }
-    }
-  } else if (state === 'high') {
-    if (angle <= lowThreshold) {
-      return { newState: 'low', repCompleted: true }
-    }
+  if (phase === 'idle') {
+    return { newState: { phase: 'rising', localPeak: angle, localValley: angle }, repCompleted: false }
   }
 
+  if (phase === 'rising') {
+    if (angle > localPeak) {
+      return { newState: { phase: 'rising', localPeak: angle, localValley }, repCompleted: false }
+    }
+    if (angle <= localPeak - HYSTERESIS) {
+      const repCompleted = (localPeak - localValley) >= MIN_AMPLITUDE
+      return { newState: { phase: 'falling', localPeak, localValley: angle }, repCompleted }
+    }
+    return { newState: state, repCompleted: false }
+  }
+
+  // phase === 'falling'
+  if (angle < localValley) {
+    return { newState: { phase: 'falling', localPeak, localValley: angle }, repCompleted: false }
+  }
+  if (angle >= localValley + HYSTERESIS) {
+    return { newState: { phase: 'rising', localPeak: angle, localValley }, repCompleted: false }
+  }
   return { newState: state, repCompleted: false }
 }
 
