@@ -442,20 +442,11 @@ export default function SessionPage() {
   if (appState === 'tutorial' && selectedExercise) {
     return (
       <div className="flex flex-col flex-1 min-h-0 bg-white">
-        {/* Back button overlay */}
-        <div className="absolute top-4 left-4 z-10">
-          <button
-            className="w-9 h-9 bg-white shadow-md rounded-xl flex items-center justify-center"
-            onClick={() => { setAppState('select'); setSelectedExercise(null) }}
-          >
-            <ChevronLeft size={20} className="text-slate-600" />
-          </button>
-        </div>
-
         <ExerciseGuide
           exercise={selectedExercise}
           loading={modelLoading}
           onStart={startFromTutorial}
+          onBack={() => { setAppState('select'); setSelectedExercise(null) }}
         />
       </div>
     )

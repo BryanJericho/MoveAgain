@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Camera, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Camera, AlertTriangle, CheckCircle2, ChevronLeft } from 'lucide-react'
 import type { ExerciseConfig } from '../lib/exercises'
 
 interface Props {
   exercise: ExerciseConfig
   onStart: () => void
+  onBack?: () => void
   loading?: boolean
 }
 
@@ -208,11 +209,19 @@ function JointDiagram({ exercise }: { exercise: ExerciseConfig }) {
 }
 
 // ── Main component ──────────────────────────────────────────────────
-export default function ExerciseGuide({ exercise, onStart, loading }: Props) {
+export default function ExerciseGuide({ exercise, onStart, onBack, loading }: Props) {
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-white">
       {/* Header */}
-      <div className="gradient-blue px-5 pt-10 pb-5 text-white">
+      <div className="gradient-blue px-5 pt-12 pb-5 text-white">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mb-4 w-8 h-8 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center transition-colors"
+          >
+            <ChevronLeft size={18} color="white" />
+          </button>
+        )}
         <p className="text-xs text-white/60 font-medium mb-1">Tutorial Latihan</p>
         <h2 className="text-xl font-black">{exercise.name}</h2>
         <p className="text-sm text-white/70 mt-1">ROM Normal: {exercise.normalRange[0]}° – {exercise.normalRange[1]}°</p>
