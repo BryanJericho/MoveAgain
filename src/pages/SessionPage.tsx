@@ -426,7 +426,7 @@ export default function SessionPage() {
                   <p className="font-semibold text-sm text-slate-800 truncate">{ex.name}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{ex.description}</p>
                   <p className="text-xs text-primary-600 font-medium mt-1">
-                    ROM Normal: {ex.normalRange[0]}°–{ex.normalRange[1]}°
+                    Gerak normal: {ex.normalRange[0]}°–{ex.normalRange[1]}°
                   </p>
                 </div>
                 <ChevronLeft size={16} className="text-slate-400 rotate-180 flex-shrink-0" />
@@ -475,9 +475,9 @@ export default function SessionPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'ROM Maksimum', value: `${Math.round(result.maxRom)}°`, c: color },
-              { label: 'ROM Rata-rata', value: `${Math.round(result.avgRom)}°`, c: '#1d4ed8' },
-              { label: 'Repetisi', value: result.repCount, c: '#4f46e5' },
+              { label: 'Gerak Tertinggi', value: `${Math.round(result.maxRom)}°`, c: color },
+              { label: 'Gerak Rata-rata', value: `${Math.round(result.avgRom)}°`, c: '#1d4ed8' },
+              { label: 'Jumlah Gerakan', value: result.repCount, c: '#4f46e5' },
               { label: 'Durasi', value: formatTime(result.durationSec), c: '#0f172a' }
             ].map(({ label, value, c }) => (
               <div key={label} className="card text-center">
@@ -487,7 +487,7 @@ export default function SessionPage() {
             ))}
           </div>
           <div className="card">
-            <p className="text-sm font-semibold text-slate-700 mb-2">ROM vs Normal</p>
+            <p className="text-sm font-semibold text-slate-700 mb-2">Dibanding Gerakan Normal</p>
             <div className="flex items-center gap-3">
               <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
                 <div className="h-3 rounded-full transition-all duration-700"
@@ -495,13 +495,13 @@ export default function SessionPage() {
               </div>
               <span className="text-sm font-bold" style={{ color }}>{pct}%</span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">Target normal: {selectedExercise?.normalRange[1]}°</p>
+            <p className="text-xs text-slate-400 mt-1">Standar normal: {selectedExercise?.normalRange[1]}°</p>
           </div>
 
           {(result.romSamples?.length ?? 0) >= 2 && (
             <div className="card">
-              <p className="text-sm font-semibold text-slate-700 mb-1">ROM Selama Sesi</p>
-              <p className="text-xs text-slate-400 mb-2">Kurva sudut sepanjang rekaman</p>
+              <p className="text-sm font-semibold text-slate-700 mb-1">Gerakan Selama Latihan</p>
+              <p className="text-xs text-slate-400 mb-2">Grafik sudut gerak selama sesi</p>
               <SessionSamplesChart
                 samples={result.romSamples!}
                 normalMax={selectedExercise?.normalRange[1]}
@@ -588,7 +588,7 @@ export default function SessionPage() {
         {appState === 'preview' && (
           <div className="absolute top-3 left-3 bg-blue-500/80 rounded-full px-3 py-1 flex items-center gap-1.5">
             <div className="w-2 h-2 bg-white rounded-full" />
-            <span className="text-white text-xs font-bold">PREVIEW</span>
+            <span className="text-white text-xs font-bold">SIAP</span>
           </div>
         )}
 

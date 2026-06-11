@@ -49,14 +49,14 @@ export default function OnboardingPage() {
             <p className="text-slate-500 mt-1 font-medium">Setiap Gerakan, Selangkah Pemulihan</p>
           </div>
           <p className="text-slate-600 leading-relaxed">
-            Aplikasi pemantauan pemulihan pasca-stroke berbasis <em>computer vision</em>.
-            Lacak Range of Motion (ROM) Anda setiap hari tanpa alat tambahan.
+            Bantu latihan gerak harian Anda setelah stroke.
+            Cukup pakai kamera HP — tanpa alat tambahan.
           </p>
           <div className="w-full space-y-3">
             {[
-              ['📷', 'Deteksi Otomatis', 'MediaPipe AI tracking real-time'],
-              ['📊', 'Pantau Progres', 'Grafik ROM tersimpan di cloud'],
-              ['🤖', 'Konsultasi AI', 'Tanya jawab berbasis data Anda'],
+              ['📷', 'Kamera Mengukur Otomatis', 'HP Anda langsung mendeteksi gerakan'],
+              ['📊', 'Catatan Kemajuan', 'Tersimpan otomatis, bisa dilihat kapan saja'],
+              ['🤖', 'Tanya Jawab', 'Ada asisten yang siap membantu Anda'],
             ].map(([icon, title, sub]) => (
               <div key={title} className="flex items-center gap-3 bg-primary-50 rounded-xl p-3">
                 <span className="text-2xl">{icon}</span>
@@ -82,8 +82,8 @@ export default function OnboardingPage() {
   return (
     <div className="flex flex-col min-h-screen p-6 bg-white">
       <div className="flex flex-col gap-2 mb-8 mt-8">
-        <h2 className="text-2xl font-bold text-primary-900">Profil Pasien</h2>
-        <p className="text-slate-500 text-sm">Isi data ini untuk personalisasi program latihan Anda</p>
+        <h2 className="text-2xl font-bold text-primary-900">Data Diri</h2>
+        <p className="text-slate-500 text-sm">Isi data ini agar latihan sesuai dengan kondisi Anda</p>
       </div>
 
       <div className="flex flex-col gap-5 flex-1">
@@ -131,7 +131,7 @@ export default function OnboardingPage() {
         </div>
 
         <div>
-          <label className="label">Sisi Tubuh yang Terdampak</label>
+          <label className="label">Sisi Tubuh yang Lemas / Lemah</label>
           <div className="grid grid-cols-3 gap-2">
             {([['left', 'Kiri'], ['right', 'Kanan'], ['both', 'Keduanya']] as const).map(([val, lbl]) => (
               <button
@@ -150,7 +150,7 @@ export default function OnboardingPage() {
         </div>
 
         <div>
-          <label className="label">Jenis Stroke</label>
+          <label className="label">Jenis Stroke <span className="text-slate-400 font-normal">(tanyakan ke dokter jika belum tahu)</span></label>
           <div className="grid grid-cols-2 gap-3">
             {(['Iskemik', 'Hemoragik'] as const).map(t => (
               <button
@@ -162,14 +162,14 @@ export default function OnboardingPage() {
                 }`}
                 onClick={() => setForm(f => ({ ...f, strokeType: t }))}
               >
-                {t}
+                {t === 'Iskemik' ? 'Iskemik (sumbatan)' : 'Hemoragik (pendarahan)'}
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="label">Tanggal Onset Stroke <span className="text-slate-400 font-normal">(opsional)</span></label>
+          <label className="label">Kapan Pertama Kena Stroke? <span className="text-slate-400 font-normal">(opsional)</span></label>
           <input
             className="input-field"
             type="date"
@@ -177,7 +177,7 @@ export default function OnboardingPage() {
             value={form.strokeOnsetDate}
             onChange={e => setForm(f => ({ ...f, strokeOnsetDate: e.target.value }))}
           />
-          <p className="text-xs text-slate-400 mt-1">Diperlukan untuk fitur prediksi pemulihan</p>
+          <p className="text-xs text-slate-400 mt-1">Untuk menghitung perkiraan waktu pulih Anda</p>
         </div>
       </div>
 

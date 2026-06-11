@@ -114,9 +114,9 @@ export default function HistoryPage() {
             <div className="grid grid-cols-4 gap-2">
               {[
                 { label: 'Sesi', value: summary.total },
-                { label: 'ROM Terbaik', value: `${Math.round(summary.bestRom)}°` },
-                { label: 'ROM Rata²', value: `${Math.round(summary.avgRom)}°` },
-                { label: 'Total Rep', value: summary.totalReps }
+                { label: 'Gerak Terbaik', value: `${Math.round(summary.bestRom)}°` },
+                { label: 'Rata-rata', value: `${Math.round(summary.avgRom)}°` },
+                { label: 'Total Gerak', value: summary.totalReps }
               ].map(({ label, value }) => (
                 <div key={label} className="card flex flex-col items-center text-center p-3">
                   <p className="text-lg font-black text-primary-700">{value}</p>
@@ -158,7 +158,7 @@ export default function HistoryPage() {
                 {chartTab === 'rom' && (
                   <>
                     <p className="text-xs text-slate-400 mb-2">
-                      Tren ROM maksimum & rata-rata per sesi
+                      Kemajuan gerakan per sesi
                       {filterExercise !== 'all' && ` · ${getExerciseById(filterExercise)?.nameShort}`}
                     </p>
                     <ROMChart
@@ -171,7 +171,7 @@ export default function HistoryPage() {
                 {chartTab === 'reps' && (
                   <>
                     <p className="text-xs text-slate-400 mb-2">
-                      Jumlah repetisi per sesi — biru = terbanyak
+                      Jumlah gerakan per sesi — biru = terbanyak
                     </p>
                     <RepsChart
                       sessions={filtered}
@@ -206,7 +206,7 @@ export default function HistoryPage() {
                             {ex?.nameShort ?? s.exerciseType}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {formatDate(s.startTime)} · {formatDuration(s.durationSec)} · {s.repCount} rep
+                            {formatDate(s.startTime)} · {formatDuration(s.durationSec)} · {s.repCount} gerakan
                           </p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -235,12 +235,12 @@ export default function HistoryPage() {
                       {/* Expanded: ROM samples chart */}
                       {isExpanded && hasSamples && (
                         <div className="mt-3 pt-3 border-t border-slate-100">
-                          <p className="text-xs text-slate-400 mb-2">ROM selama sesi</p>
+                          <p className="text-xs text-slate-400 mb-2">Gerakan selama latihan</p>
                           <div className="grid grid-cols-3 gap-2 mb-3">
                             {[
-                              { label: 'Maks', value: `${Math.round(s.maxRom)}°` },
+                              { label: 'Tertinggi', value: `${Math.round(s.maxRom)}°` },
                               { label: 'Rata-rata', value: `${Math.round(s.avgRom)}°` },
-                              { label: 'Min', value: `${Math.round(s.minRom)}°` },
+                              { label: 'Terendah', value: `${Math.round(s.minRom)}°` },
                             ].map(({ label, value }) => (
                               <div key={label} className="bg-slate-50 rounded-lg p-2 text-center">
                                 <p className="text-sm font-bold text-primary-700">{value}</p>
@@ -269,7 +269,7 @@ export default function HistoryPage() {
             <div>
               <p className="font-bold text-slate-700">Belum Ada Data</p>
               <p className="text-sm text-slate-500 mt-1">
-                Mulai latihan untuk melihat progres ROM Anda di sini
+                Mulai latihan untuk melihat kemajuan Anda di sini
               </p>
             </div>
           </div>

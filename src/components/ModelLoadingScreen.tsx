@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
 const STAGES = [
-  { at: 0,  icon: '⚙️', text: 'Menginisialisasi WebAssembly…',      sub: null },
-  { at: 3,  icon: '⬇️', text: 'Mengunduh model AI…',                sub: '~15 MB · hanya pada kunjungan pertama' },
-  { at: 14, icon: '🔧', text: 'Menyiapkan detektor pose…',          sub: 'Hampir selesai' },
-  { at: 22, icon: '⏳', text: 'Masih memuat, harap tunggu…',        sub: 'Koneksi lambat? Tetap tunggu ya' },
+  { at: 0,  icon: '⚙️', text: 'Menyiapkan aplikasi…',                sub: null },
+  { at: 3,  icon: '⬇️', text: 'Mengunduh program pendeteksi gerak…', sub: 'Sekitar 15 MB · hanya pertama kali saja' },
+  { at: 14, icon: '📷', text: 'Menyiapkan kamera…',                  sub: 'Hampir siap' },
+  { at: 22, icon: '⏳', text: 'Sebentar lagi ya…',                   sub: 'Koneksi lambat? Tetap tunggu ya' },
 ]
 
 export default function ModelLoadingScreen() {
@@ -53,8 +53,8 @@ export default function ModelLoadingScreen() {
       {elapsed >= 4 && (
         <div className="bg-primary-50 border border-primary-100 rounded-2xl p-4 max-w-xs text-center">
           <p className="text-xs text-primary-700 leading-relaxed">
-            <strong>Kunjungan pertama</strong> memerlukan unduhan ~15 MB model AI.
-            Setelah ini, model tersimpan di perangkat dan akan <strong>langsung siap</strong> tanpa unduhan lagi.
+            <strong>Pertama kali buka</strong>, aplikasi perlu mengunduh program pendeteksi gerak (~15 MB).
+            Setelah itu, aplikasi akan <strong>langsung siap</strong> tanpa perlu unduh lagi.
           </p>
         </div>
       )}

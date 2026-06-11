@@ -98,7 +98,7 @@ export default function HomePage() {
             <div className="card flex flex-col items-center text-center gap-1">
               <TrendingUp size={20} className="text-green-500" />
               <p className="text-2xl font-bold text-green-700">{Math.round(stats.lastMaxRom)}°</p>
-              <p className="text-xs text-slate-500">ROM Terakhir</p>
+              <p className="text-xs text-slate-500">Gerak Terakhir</p>
             </div>
             <div className="card flex flex-col items-center text-center gap-1">
               <Flame size={20} className="text-orange-500" />
@@ -160,12 +160,12 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-slate-800">{ex?.nameShort ?? s.exerciseType}</p>
-                        <p className="text-xs text-slate-500">{formatDate(s.startTime)} · {s.repCount} rep</p>
+                        <p className="text-xs text-slate-500">{formatDate(s.startTime)} · {s.repCount} gerakan</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-base font-bold text-primary-700">{Math.round(s.maxRom)}°</p>
-                      <p className="text-xs text-slate-400">maks ROM</p>
+                      <p className="text-xs text-slate-400">gerak maks</p>
                     </div>
                   </div>
                 )
@@ -179,9 +179,9 @@ export default function HomePage() {
           <div className="card flex flex-col items-center text-center gap-4 py-8">
             <span className="text-5xl">🏃</span>
             <div>
-              <p className="font-bold text-slate-700">Belum Ada Sesi</p>
+              <p className="font-bold text-slate-700">Belum Ada Latihan</p>
               <p className="text-sm text-slate-500 mt-1">
-                Mulai latihan pertama Anda untuk melacak progres pemulihan
+                Mulai latihan pertama Anda hari ini — setiap gerakan adalah kemajuan!
               </p>
             </div>
             <button className="btn-primary" onClick={() => navigate('/session')}>
@@ -196,8 +196,8 @@ export default function HomePage() {
           <div>
             <p className="text-sm font-semibold text-blue-800">Tips Pemulihan</p>
             <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
-              Konsistensi lebih penting dari intensitas. Latihan 15 menit setiap hari
-              lebih baik dari 1 jam seminggu sekali.
+              Rutin lebih penting dari keras. Latihan 15 menit tiap hari jauh lebih baik
+              dibanding latihan lama tapi hanya sekali seminggu.
             </p>
           </div>
         </div>

@@ -94,7 +94,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <User size={18} className="text-primary-600" />
-              <h2 className="font-semibold text-slate-700">Profil Pasien</h2>
+              <h2 className="font-semibold text-slate-700">Data Diri</h2>
             </div>
             <button
               className="text-primary-600 text-sm font-semibold"
@@ -110,9 +110,9 @@ export default function SettingsPage() {
                 ['Nama', currentPatient?.name],
                 ['Usia', `${currentPatient?.age} tahun`],
                 ['Jenis Kelamin', currentPatient?.gender === 'male' ? 'Laki-laki' : 'Perempuan'],
-                ['Sisi Terdampak', { left: 'Kiri', right: 'Kanan', both: 'Keduanya' }[currentPatient?.affectedSide ?? 'right']],
+                ['Sisi Lemah', { left: 'Kiri', right: 'Kanan', both: 'Keduanya' }[currentPatient?.affectedSide ?? 'right']],
                 ['Jenis Stroke', currentPatient?.strokeType ?? '-'],
-                ['Onset Stroke', currentPatient?.strokeOnsetDate
+                ['Pertama Kena Stroke', currentPatient?.strokeOnsetDate
                   ? new Date(currentPatient.strokeOnsetDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
                   : '-']
               ].map(([label, value]) => (
@@ -143,7 +143,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div>
-                <label className="label">Sisi Terdampak</label>
+                <label className="label">Sisi Lemah / Lemas</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['left', 'right', 'both'] as const).map(s => (
                     <button key={s} className={`py-2.5 rounded-xl border-2 text-xs font-medium transition-colors ${form.affectedSide === s ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 text-slate-600'}`} onClick={() => setForm(f => ({ ...f, affectedSide: s }))}>
@@ -157,13 +157,13 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-2 gap-2">
                   {(['Iskemik', 'Hemoragik'] as const).map(t => (
                     <button key={t} className={`py-2.5 rounded-xl border-2 text-sm font-medium transition-colors ${form.strokeType === t ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 text-slate-600'}`} onClick={() => setForm(f => ({ ...f, strokeType: t }))}>
-                      {t}
+                      {t === 'Iskemik' ? 'Iskemik (sumbatan)' : 'Hemoragik (pendarahan)'}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="label">Tanggal Onset Stroke</label>
+                <label className="label">Kapan Pertama Kena Stroke?</label>
                 <input
                   className="input-field"
                   type="date"
@@ -216,9 +216,9 @@ export default function SettingsPage() {
           <div className="space-y-2 text-sm">
             {[
               ['Versi', '1.0.0'],
-              ['Database', 'Firebase Firestore'],
-              ['Auth', 'Firebase Authentication'],
-              ['Pose Engine', 'MediaPipe Tasks Vision'],
+              ['Database', 'Penyimpanan Data'],
+              ['Auth', 'Keamanan Akun'],
+              ['Pose Engine', 'Pendeteksi Gerakan'],
               ['AI Chatbot', 'Gemini 2.5 Flash'],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between">

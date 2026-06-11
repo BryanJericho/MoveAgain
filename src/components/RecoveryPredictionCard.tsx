@@ -91,25 +91,22 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
         <div className="w-7 h-7 gradient-blue rounded-lg flex items-center justify-center flex-shrink-0">
           <Brain size={14} color="white" />
         </div>
-        <h3 className="font-bold text-slate-800 text-sm">Prediksi Pemulihan</h3>
-        <span className="ml-auto text-[10px] bg-primary-100 text-primary-700 font-semibold px-2 py-0.5 rounded-full">
-          Model Bayesian
-        </span>
+        <h3 className="font-bold text-slate-800 text-sm">Perkiraan Waktu Pulih</h3>
       </div>
 
       {missingProfile ? (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
           <AlertCircle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 leading-relaxed">
-            Lengkapi <strong>jenis stroke</strong> dan <strong>tanggal onset stroke</strong> di
-            halaman <strong>Pengaturan → Profil Pasien</strong> untuk mengaktifkan prediksi ini.
+            Lengkapi <strong>jenis stroke</strong> dan <strong>tanggal pertama kena stroke</strong> di
+            halaman <strong>Pengaturan → Data Diri</strong> untuk mengaktifkan fitur ini.
           </p>
         </div>
       ) : (
         <>
           {joints.length > 1 && (
             <div className="mb-3">
-              <label className="label text-xs">Sendi yang diprediksi</label>
+              <label className="label text-xs">Bagian tubuh</label>
               <div className="relative">
                 <select
                   className="input-field text-sm appearance-none pr-8"
@@ -140,7 +137,7 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
                 </p>
                 <p className="text-sm text-slate-500 mt-1">{sisaInfo.sub}</p>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Rentang: {sisaCI.low} – {sisaCI.high} hari (CI 95%)
+                  Perkiraan: {sisaCI.low} sampai {sisaCI.high} hari
                 </p>
               </div>
 
@@ -172,12 +169,8 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-3">
-              <p className="text-xs text-red-600 font-medium">Gagal menghitung prediksi</p>
-              <p className="text-xs text-red-500 mt-0.5">{error}</p>
-              <p className="text-xs text-red-400 mt-1">
-                Pastikan server R berjalan:{' '}
-                <code className="bg-red-100 px-1 rounded">npm run rapi</code>
-              </p>
+              <p className="text-xs text-red-600 font-medium">Tidak dapat menghitung saat ini</p>
+              <p className="text-xs text-red-500 mt-0.5">Coba lagi nanti atau hubungi pendamping Anda.</p>
             </div>
           )}
 
@@ -189,13 +182,13 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
             {loading
               ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               : <RefreshCw size={14} />}
-            {loading ? 'Menghitung...' : result ? 'Hitung Ulang' : `Hitung Prediksi (${sessionCount} sesi)`}
+            {loading ? 'Menghitung…' : result ? 'Perbarui Perkiraan' : `Lihat Perkiraan (${sessionCount} sesi)`}
           </button>
         </>
       )}
 
       <p className="text-[10px] text-slate-400 mt-2 text-center leading-relaxed">
-        Prediksi bersifat informatif. Selalu konsultasikan hasil dengan dokter atau terapis Anda.
+        Ini hanya perkiraan. Tetap konsultasikan dengan dokter atau terapis Anda.
       </p>
     </div>
   )
