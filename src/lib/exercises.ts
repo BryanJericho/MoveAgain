@@ -1,10 +1,16 @@
 export type ExerciseMode = 'body' | 'hand'
 
+// abduction: raw interior angle = clinical angle (shoulder abduction)
+// flexion:   180° − interior angle = clinical angle (elbow, knee, fingers)
+// dorsiflexion: 90° − interior angle = clinical angle (ankle)
+export type AngleMode = 'abduction' | 'flexion' | 'dorsiflexion'
+
 export interface ExerciseConfig {
   id: string
   name: string
   nameShort: string
   mode: ExerciseMode
+  angleMode: AngleMode
   landmarks: [number, number, number]
   normalRange: [number, number]
   jointTarget: string
@@ -23,6 +29,7 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi/Ekstensi Siku Kanan',
     nameShort: 'Siku Kanan',
     mode: 'body',
+    angleMode: 'flexion',
     landmarks: [12, 14, 16],
     normalRange: [0, 145],
     jointTarget: 'elbow_right',
@@ -53,6 +60,7 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi/Ekstensi Siku Kiri',
     nameShort: 'Siku Kiri',
     mode: 'body',
+    angleMode: 'flexion',
     landmarks: [11, 13, 15],
     normalRange: [0, 145],
     jointTarget: 'elbow_left',
@@ -83,6 +91,7 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Abduksi Bahu Kanan',
     nameShort: 'Bahu Kanan',
     mode: 'body',
+    angleMode: 'abduction',
     landmarks: [24, 12, 14],
     normalRange: [0, 180],
     jointTarget: 'shoulder_right',
@@ -113,6 +122,7 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Abduksi Bahu Kiri',
     nameShort: 'Bahu Kiri',
     mode: 'body',
+    angleMode: 'abduction',
     landmarks: [23, 11, 13],
     normalRange: [0, 180],
     jointTarget: 'shoulder_left',
@@ -143,29 +153,31 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Lutut Kanan',
     nameShort: 'Lutut Kanan',
     mode: 'body',
+    angleMode: 'flexion',
     landmarks: [24, 26, 28],
     normalRange: [0, 135],
     jointTarget: 'knee_right',
     description: 'Mengukur kemampuan menekuk lutut kanan',
-    instruction: 'Tekuk lutut secara perlahan dari posisi berdiri atau berbaring',
+    instruction: 'Angkat tumit ke arah bokong secara perlahan sambil berdiri',
     affectedSide: 'right',
-    positionHint: 'Duduk di ujung kursi, sisi kanan menghadap kamera',
+    positionHint: 'Berdiri menyamping kamera — sisi kanan menghadap kamera',
     steps: [
-      'Duduk di ujung kursi dengan punggung tegak',
-      'Luruskan kaki kanan ke depan (posisi awal)',
-      'Tekuk lutut ke bawah secara perlahan',
+      'Berdiri tegak, pegang dinding atau sandaran kursi dengan tangan yang sehat',
+      'Pastikan sisi kanan tubuh menghadap kamera',
+      'Tekuk lutut kanan ke belakang perlahan — angkat tumit ke arah bokong',
       'Tahan 1–2 detik di tekukan terdalam',
-      'Luruskan kembali ke posisi awal',
+      'Turunkan kaki kembali ke lantai dengan perlahan',
+      'Ulangi gerakan dengan ritme yang nyaman',
     ],
     cameraTips: [
-      'Kamera dari sisi kanan tubuh, jarak 1–1,5 meter',
-      'Seluruh kaki dari paha hingga telapak harus terlihat',
-      'Ketinggian kamera setinggi lutut',
+      'Kamera di sisi kanan, setinggi pinggang',
+      'Seluruh tubuh dari pinggang hingga telapak kaki harus terlihat',
+      'Jarak 1,5–2 meter dari tubuh',
     ],
     commonMistakes: [
-      'Jangan angkat paha dari permukaan kursi saat menekuk',
-      'Jangan putar pinggul ke samping',
-      'Pastikan kaki tidak tersembunyi di bawah kursi',
+      'Jangan condongkan badan ke depan — punggung tetap tegak',
+      'Jangan angkat paha ke depan — paha harus tetap lurus ke bawah',
+      'Pegang pegangan agar tidak kehilangan keseimbangan',
     ],
   },
   {
@@ -173,29 +185,31 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Lutut Kiri',
     nameShort: 'Lutut Kiri',
     mode: 'body',
+    angleMode: 'flexion',
     landmarks: [23, 25, 27],
     normalRange: [0, 135],
     jointTarget: 'knee_left',
     description: 'Mengukur kemampuan menekuk lutut kiri',
-    instruction: 'Tekuk lutut secara perlahan dari posisi berdiri atau berbaring',
+    instruction: 'Angkat tumit ke arah bokong secara perlahan sambil berdiri',
     affectedSide: 'left',
-    positionHint: 'Duduk di ujung kursi, sisi kiri menghadap kamera',
+    positionHint: 'Berdiri menyamping kamera — sisi kiri menghadap kamera',
     steps: [
-      'Duduk di ujung kursi dengan punggung tegak',
-      'Luruskan kaki kiri ke depan (posisi awal)',
-      'Tekuk lutut ke bawah secara perlahan',
+      'Berdiri tegak, pegang dinding atau sandaran kursi dengan tangan yang sehat',
+      'Pastikan sisi kiri tubuh menghadap kamera',
+      'Tekuk lutut kiri ke belakang perlahan — angkat tumit ke arah bokong',
       'Tahan 1–2 detik di tekukan terdalam',
-      'Luruskan kembali ke posisi awal',
+      'Turunkan kaki kembali ke lantai dengan perlahan',
+      'Ulangi gerakan dengan ritme yang nyaman',
     ],
     cameraTips: [
-      'Kamera dari sisi kiri tubuh, jarak 1–1,5 meter',
-      'Seluruh kaki dari paha hingga telapak harus terlihat',
-      'Ketinggian kamera setinggi lutut',
+      'Kamera di sisi kiri, setinggi pinggang',
+      'Seluruh tubuh dari pinggang hingga telapak kaki harus terlihat',
+      'Jarak 1,5–2 meter dari tubuh',
     ],
     commonMistakes: [
-      'Jangan angkat paha dari permukaan kursi saat menekuk',
-      'Jangan putar pinggul ke samping',
-      'Pastikan kaki tidak tersembunyi di bawah kursi',
+      'Jangan condongkan badan ke depan — punggung tetap tegak',
+      'Jangan angkat paha ke depan — paha harus tetap lurus ke bawah',
+      'Pegang pegangan agar tidak kehilangan keseimbangan',
     ],
   },
   {
@@ -203,6 +217,7 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     name: 'Dorsifleksi Ankle Kanan',
     nameShort: 'Ankle Kanan',
     mode: 'body',
+    angleMode: 'dorsiflexion',
     landmarks: [26, 28, 32],
     normalRange: [0, 20],
     jointTarget: 'ankle_right',
@@ -238,6 +253,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Jari Telunjuk (PIP)',
     nameShort: 'Telunjuk',
     mode: 'hand',
+    angleMode: 'flexion',
     landmarks: [5, 6, 7],
     normalRange: [0, 100],
     jointTarget: 'index_pip',
@@ -268,6 +284,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Jari Tengah (PIP)',
     nameShort: 'Jari Tengah',
     mode: 'hand',
+    angleMode: 'flexion',
     landmarks: [9, 10, 11],
     normalRange: [0, 100],
     jointTarget: 'middle_pip',
@@ -297,6 +314,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Jari Manis (PIP)',
     nameShort: 'Jari Manis',
     mode: 'hand',
+    angleMode: 'flexion',
     landmarks: [13, 14, 15],
     normalRange: [0, 100],
     jointTarget: 'ring_pip',
@@ -324,6 +342,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Kelingking (PIP)',
     nameShort: 'Kelingking',
     mode: 'hand',
+    angleMode: 'flexion',
     landmarks: [17, 18, 19],
     normalRange: [0, 100],
     jointTarget: 'pinky_pip',
@@ -351,6 +370,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Ibu Jari (IP)',
     nameShort: 'Ibu Jari',
     mode: 'hand',
+    angleMode: 'flexion',
     landmarks: [2, 3, 4],
     normalRange: [0, 80],
     jointTarget: 'thumb_ip',
@@ -378,6 +398,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     name: 'Fleksi Jari Telunjuk (MCP)',
     nameShort: 'MCP Telunjuk',
     mode: 'hand',
+    angleMode: 'flexion',
     landmarks: [0, 5, 6],
     normalRange: [0, 90],
     jointTarget: 'index_mcp',

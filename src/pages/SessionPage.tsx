@@ -39,9 +39,15 @@ const POSITION_HINTS: Record<string, string> = {
   elbow_flex_left:    'Pastikan bahu kiri, siku, dan pergelangan terlihat',
   shoulder_abd_right: 'Mundur agar bahu & lengan atas penuh dalam frame',
   shoulder_abd_left:  'Mundur agar bahu & lengan atas penuh dalam frame',
-  knee_flex_right:    'Posisi samping — pinggul sampai tumit harus terlihat',
-  knee_flex_left:     'Posisi samping — pinggul sampai tumit harus terlihat',
+  knee_flex_right:    'Berdiri menyamping — pinggang sampai tumit kanan harus terlihat',
+  knee_flex_left:     'Berdiri menyamping — pinggang sampai tumit kiri harus terlihat',
   ankle_dorsi_right:  'Duduk, luruskan kaki, arahkan kamera ke pergelangan',
+}
+
+function transformAngle(raw: number, mode: ExerciseConfig['angleMode']): number {
+  if (mode === 'flexion') return Math.max(0, 180 - raw)
+  if (mode === 'dorsiflexion') return Math.max(0, 90 - raw)
+  return raw
 }
 
 const VISIBILITY_THRESHOLD = 0.45
@@ -166,7 +172,8 @@ export default function SessionPage() {
             setDetected(vis >= VISIBILITY_THRESHOLD)
 
             if (vis >= VISIBILITY_THRESHOLD) {
-              const raw = calculateAngle(lms[idxA], lms[idxB], lms[idxC])
+              const rawInterior = calculateAngle(lms[idxA], lms[idxB], lms[idxC])
+              const raw = transformAngle(rawInterior, ex.angleMode)
               smoothAngleRef.current = applyLowPassFilter(smoothAngleRef.current, raw)
               const angle = smoothAngleRef.current
               drawAngleLabel(ctx, lms[idxB], angle, canvas.width, canvas.height)
@@ -192,7 +199,8 @@ export default function SessionPage() {
           if (res.landmarks.length > 0) {
             const lms = res.landmarks[0]
             setDetected(true)
-            const raw = calculateAngle(lms[idxA], lms[idxB], lms[idxC])
+            const rawInterior = calculateAngle(lms[idxA], lms[idxB], lms[idxC])
+            const raw = transformAngle(rawInterior, ex.angleMode)
             smoothAngleRef.current = applyLowPassFilter(smoothAngleRef.current, raw)
             const angle = smoothAngleRef.current
             drawAngleLabel(ctx, lms[idxB], angle, canvas.width, canvas.height)
