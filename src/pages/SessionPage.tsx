@@ -20,7 +20,7 @@ import {
   INITIAL_REP_STATE, type RepState
 } from '../lib/rom'
 import {
-  BODY_EXERCISES, HAND_EXERCISES, type ExerciseConfig, type ExerciseMode
+  BODY_EXERCISES, HAND_EXERCISES, getNormalMax, type ExerciseConfig, type ExerciseMode
 } from '../lib/exercises'
 import ExerciseGuide from '../components/ExerciseGuide'
 import SessionSamplesChart from '../components/SessionSamplesChart'
@@ -434,7 +434,7 @@ export default function SessionPage() {
                   <p className="font-semibold text-sm text-slate-800 truncate">{ex.name}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{ex.description}</p>
                   <p className="text-xs text-primary-600 font-medium mt-1">
-                    Gerak normal: {ex.normalRange[0]}°–{ex.normalRange[1]}°
+                    Gerak normal: {ex.normalRange[0]}°–{getNormalMax(ex, currentPatient?.age)}°
                   </p>
                 </div>
                 <ChevronLeft size={16} className="text-slate-400 rotate-180 flex-shrink-0" />
@@ -467,7 +467,7 @@ export default function SessionPage() {
 
   // ── DONE ──────────────────────────────────────────────────
   if (appState === 'done' && result) {
-    const pct = getRomPercentage(result.maxRom, selectedExercise?.normalRange[1] ?? 180)
+    const pct = getRomPercentage(result.maxRom, selectedExercise ? getNormalMax(selectedExercise, currentPatient?.age) : 180)
     const color = getRomColor(pct)
     return (
       <div className="page-container bg-white">
@@ -503,7 +503,7 @@ export default function SessionPage() {
               </div>
               <span className="text-sm font-bold" style={{ color }}>{pct}%</span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">Standar normal: {selectedExercise?.normalRange[1]}°</p>
+            <p className="text-xs text-slate-400 mt-1">Standar normal: {selectedExercise ? getNormalMax(selectedExercise, currentPatient?.age) : '-'}°</p>
           </div>
 
           {(result.romSamples?.length ?? 0) >= 2 && (
@@ -512,7 +512,7 @@ export default function SessionPage() {
               <p className="text-xs text-slate-400 mb-2">Grafik sudut gerak selama sesi</p>
               <SessionSamplesChart
                 samples={result.romSamples!}
-                normalMax={selectedExercise?.normalRange[1]}
+                normalMax={selectedExercise ? getNormalMax(selectedExercise, currentPatient?.age) : undefined}
                 height={150}
               />
             </div>
@@ -532,7 +532,7 @@ export default function SessionPage() {
   }
 
   // ── PREVIEW / RECORDING ───────────────────────────────────
-  const romPct = getRomPercentage(currentAngle, selectedExercise?.normalRange[1] ?? 180)
+  const romPct = getRomPercentage(currentAngle, selectedExercise ? getNormalMax(selectedExercise, currentPatient?.age) : 180)
   const romColor = getRomColor(romPct)
   const posHint = selectedExercise ? (POSITION_HINTS[selectedExercise.id] ?? selectedExercise.instruction) : ''
 
@@ -636,7 +636,7 @@ export default function SessionPage() {
           </div>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-white/60 text-xs">vs Normal ({selectedExercise?.normalRange[1]}°)</p>
+              <p className="text-white/60 text-xs">vs Normal ({selectedExercise ? getNormalMax(selectedExercise, currentPatient?.age) : '-'}°)</p>
               {detected && <p className="text-xs font-bold" style={{ color: romColor }}>{romPct}%</p>}
             </div>
             <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">

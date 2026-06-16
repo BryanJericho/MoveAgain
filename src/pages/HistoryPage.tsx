@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BarChart2, Filter, Trash2, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react'
 import { getRecentSessions, deleteSession, type Session } from '../lib/db'
 import { useAppStore } from '../store/useAppStore'
-import { getExerciseById, ALL_EXERCISES } from '../lib/exercises'
+import { getExerciseById, getNormalMax, ALL_EXERCISES } from '../lib/exercises'
 import ROMChart from '../components/ROMChart'
 import RepsChart from '../components/RepsChart'
 import SessionSamplesChart from '../components/SessionSamplesChart'
@@ -250,7 +250,7 @@ export default function HistoryPage() {
                           </div>
                           <SessionSamplesChart
                             samples={s.romSamples!}
-                            normalMax={ex?.normalRange[1]}
+                            normalMax={ex ? getNormalMax(ex, currentPatient?.age) : undefined}
                             height={130}
                           />
                         </div>

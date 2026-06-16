@@ -5,6 +5,12 @@ export type ExerciseMode = 'body' | 'hand'
 // dorsiflexion: 90° − interior angle = clinical angle (ankle)
 export type AngleMode = 'abduction' | 'flexion' | 'dorsiflexion'
 
+export interface AgeGroupRange {
+  minAge: number
+  maxAge: number
+  normalMax: number
+}
+
 export interface ExerciseConfig {
   id: string
   name: string
@@ -12,15 +18,24 @@ export interface ExerciseConfig {
   mode: ExerciseMode
   angleMode: AngleMode
   landmarks: [number, number, number]
-  normalRange: [number, number]
+  normalRange: [number, number]        // default untuk usia 60-84 tahun
+  normalRangeByAge?: AgeGroupRange[]   // override per kelompok usia
   jointTarget: string
   description: string
   instruction: string
   affectedSide?: 'left' | 'right'
-  positionHint: string      // satu kalimat posisi tubuh
-  steps: string[]           // langkah-langkah bernomor
-  cameraTips: string[]      // tips kamera spesifik
-  commonMistakes: string[]  // kesalahan umum yang perlu dihindari
+  positionHint: string
+  steps: string[]
+  cameraTips: string[]
+  commonMistakes: string[]
+}
+
+export function getNormalMax(exercise: ExerciseConfig, age?: number): number {
+  if (age && exercise.normalRangeByAge?.length) {
+    const match = exercise.normalRangeByAge.find(r => age >= r.minAge && age <= r.maxAge)
+    if (match) return match.normalMax
+  }
+  return exercise.normalRange[1]
 }
 
 export const BODY_EXERCISES: ExerciseConfig[] = [
@@ -31,7 +46,11 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'flexion',
     landmarks: [12, 14, 16],
-    normalRange: [0, 145],
+    normalRange: [0, 144],
+    normalRangeByAge: [
+      { minAge: 20, maxAge: 54, normalMax: 141 },
+      { minAge: 55, maxAge: 120, normalMax: 144 },
+    ],
     jointTarget: 'elbow_right',
     description: 'Mengukur kemampuan menekuk dan meluruskan siku kanan',
     instruction: 'Tekuk siku secara perlahan hingga maksimal, lalu luruskan kembali',
@@ -62,7 +81,11 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'flexion',
     landmarks: [11, 13, 15],
-    normalRange: [0, 145],
+    normalRange: [0, 144],
+    normalRangeByAge: [
+      { minAge: 20, maxAge: 54, normalMax: 141 },
+      { minAge: 55, maxAge: 120, normalMax: 144 },
+    ],
     jointTarget: 'elbow_left',
     description: 'Mengukur kemampuan menekuk dan meluruskan siku kiri',
     instruction: 'Tekuk siku secara perlahan hingga maksimal, lalu luruskan kembali',
@@ -93,7 +116,11 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'abduction',
     landmarks: [24, 12, 14],
-    normalRange: [0, 180],
+    normalRange: [0, 165],
+    normalRangeByAge: [
+      { minAge: 20, maxAge: 54, normalMax: 183 },
+      { minAge: 55, maxAge: 120, normalMax: 165 },
+    ],
     jointTarget: 'shoulder_right',
     description: 'Mengukur kemampuan mengangkat lengan ke samping',
     instruction: 'Angkat lengan ke samping secara perlahan setinggi mungkin',
@@ -124,7 +151,11 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'abduction',
     landmarks: [23, 11, 13],
-    normalRange: [0, 180],
+    normalRange: [0, 165],
+    normalRangeByAge: [
+      { minAge: 20, maxAge: 54, normalMax: 183 },
+      { minAge: 55, maxAge: 120, normalMax: 165 },
+    ],
     jointTarget: 'shoulder_left',
     description: 'Mengukur kemampuan mengangkat lengan kiri ke samping',
     instruction: 'Angkat lengan ke samping secara perlahan setinggi mungkin',
@@ -155,7 +186,12 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'flexion',
     landmarks: [24, 26, 28],
-    normalRange: [0, 135],
+    normalRange: [0, 133],
+    normalRangeByAge: [
+      { minAge: 25, maxAge: 39, normalMax: 134 },
+      { minAge: 40, maxAge: 59, normalMax: 132 },
+      { minAge: 60, maxAge: 120, normalMax: 133 },
+    ],
     jointTarget: 'knee_right',
     description: 'Mengukur kemampuan menekuk lutut kanan',
     instruction: 'Angkat tumit ke arah bokong secara perlahan sambil berdiri',
@@ -187,7 +223,12 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'flexion',
     landmarks: [23, 25, 27],
-    normalRange: [0, 135],
+    normalRange: [0, 133],
+    normalRangeByAge: [
+      { minAge: 25, maxAge: 39, normalMax: 134 },
+      { minAge: 40, maxAge: 59, normalMax: 132 },
+      { minAge: 60, maxAge: 120, normalMax: 133 },
+    ],
     jointTarget: 'knee_left',
     description: 'Mengukur kemampuan menekuk lutut kiri',
     instruction: 'Angkat tumit ke arah bokong secara perlahan sambil berdiri',
@@ -219,7 +260,11 @@ export const BODY_EXERCISES: ExerciseConfig[] = [
     mode: 'body',
     angleMode: 'dorsiflexion',
     landmarks: [26, 28, 32],
-    normalRange: [0, 20],
+    normalRange: [0, 10],
+    normalRangeByAge: [
+      { minAge: 25, maxAge: 59, normalMax: 12 },
+      { minAge: 60, maxAge: 120, normalMax: 10 },
+    ],
     jointTarget: 'ankle_right',
     description: 'Mengukur kemampuan menekuk kaki ke atas (dorsifleksi)',
     instruction: 'Tarik ujung kaki ke atas secara perlahan',
@@ -255,7 +300,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     mode: 'hand',
     angleMode: 'flexion',
     landmarks: [5, 6, 7],
-    normalRange: [0, 100],
+    normalRange: [0, 97],
     jointTarget: 'index_pip',
     description: 'Mengukur fleksi sendi PIP jari telunjuk',
     instruction: 'Tekuk jari telunjuk pada sendi tengah (PIP) secara perlahan',
@@ -286,7 +331,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     mode: 'hand',
     angleMode: 'flexion',
     landmarks: [9, 10, 11],
-    normalRange: [0, 100],
+    normalRange: [0, 96],
     jointTarget: 'middle_pip',
     description: 'Mengukur fleksi sendi PIP jari tengah',
     instruction: 'Tekuk jari tengah pada sendi tengah (PIP) secara perlahan',
@@ -316,7 +361,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     mode: 'hand',
     angleMode: 'flexion',
     landmarks: [13, 14, 15],
-    normalRange: [0, 100],
+    normalRange: [0, 96],
     jointTarget: 'ring_pip',
     description: 'Mengukur fleksi sendi PIP jari manis',
     instruction: 'Tekuk jari manis pada sendi tengah secara perlahan',
@@ -344,7 +389,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     mode: 'hand',
     angleMode: 'flexion',
     landmarks: [17, 18, 19],
-    normalRange: [0, 100],
+    normalRange: [0, 92],
     jointTarget: 'pinky_pip',
     description: 'Mengukur fleksi sendi PIP jari kelingking',
     instruction: 'Tekuk kelingking pada sendi tengah secara perlahan',
@@ -372,7 +417,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     mode: 'hand',
     angleMode: 'flexion',
     landmarks: [2, 3, 4],
-    normalRange: [0, 80],
+    normalRange: [0, 79],
     jointTarget: 'thumb_ip',
     description: 'Mengukur fleksi sendi IP ibu jari',
     instruction: 'Tekuk ibu jari pada sendi tengah secara perlahan',
@@ -400,7 +445,7 @@ export const HAND_EXERCISES: ExerciseConfig[] = [
     mode: 'hand',
     angleMode: 'flexion',
     landmarks: [0, 5, 6],
-    normalRange: [0, 90],
+    normalRange: [0, 86],
     jointTarget: 'index_mcp',
     description: 'Mengukur fleksi sendi MCP jari telunjuk (buku jari)',
     instruction: 'Tekuk buku jari pertama jari telunjuk secara perlahan',
