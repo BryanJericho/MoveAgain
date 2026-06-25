@@ -1,8 +1,8 @@
 # =============================================================
 # prepare_deployment.R
 # Jalankan sekali secara lokal sebelum deploy.
-# Mengekstrak posterior draws dan referensi FPCA dari model brms
-# menjadi file ringan — sehingga Docker tidak perlu brms/Stan.
+# Mengekstrak posterior draws + referensi FPCA dari model brms
+# menjadi file ringan — sehingga server tidak perlu brms/Stan.
 # =============================================================
 # Jalankan: Rscript prepare_deployment.R
 # =============================================================
@@ -12,7 +12,7 @@ library(fda)
 
 setwd("d:/SEC-Stroke")
 
-cat("=== Menyiapkan file deployment ===\n\n")
+cat("=== Menyiapkan file deployment (model baru, N_SESI=90) ===\n\n")
 
 # --- 1. Ekstrak posterior draws ---
 cat("[1/2] Memuat model brms dan mengekstrak posterior draws...\n")
@@ -27,7 +27,7 @@ cat(sprintf("      Tersimpan: output/post_samp.rds (%.1f MB, %d baris x %d kolom
 cat("[2/2] Menghitung referensi FPCA dari data latih...\n")
 load("output/simulasi_data.RData")
 
-N_SESI        <- 30
+N_SESI        <- 90
 t_eval        <- 1:N_SESI
 bspline_basis <- create.bspline.basis(rangeval = c(1, N_SESI), nbasis = 12, norder = 4)
 fdPar_obj     <- fdPar(bspline_basis, Lfdobj = 2, lambda = 10^1.5)
@@ -45,7 +45,11 @@ fpca_ref <- list(
   fpc1_sd       = sd(fpca_res$scores[, 1]),
   fpc2_mean     = mean(fpca_res$scores[, 2]),
   fpc2_sd       = sd(fpca_res$scores[, 2]),
-  levels_sendi  = sort(unique(param_sendi$jenis_sendi))
+  levels_sendi  = sort(unique(as.character(param_sendi$jenis_sendi))),
+  usia_mean     = mean(data_survival$usia),
+  usia_sd       = sd(data_survival$usia),
+  onset_mean    = mean(data_survival$hari_onset),
+  onset_sd      = sd(data_survival$hari_onset)
 )
 saveRDS(fpca_ref, "output/fpca_ref.rds")
 cat(sprintf("      Tersimpan: output/fpca_ref.rds (%.1f MB)\n\n",
@@ -54,6 +58,6 @@ cat(sprintf("      Tersimpan: output/fpca_ref.rds (%.1f MB)\n\n",
 cat("=== Selesai! ===\n")
 cat("Langkah selanjutnya:\n")
 cat("  git add output/post_samp.rds output/fpca_ref.rds\n")
-cat("  git commit -m 'add: lightweight model files for deployment'\n")
+cat("  git commit -m 'update: lightweight model files for deployment'\n")
 cat("  git push\n")
-cat("Lalu deploy ke Railway.\n")
+cat("Lalu redeploy di Railway.\n")

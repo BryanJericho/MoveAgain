@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Brain, Clock, ChevronDown, AlertCircle, RefreshCw, CalendarClock } from 'lucide-react'
 import type { Session, Patient } from '../lib/db'
-import { predictRecovery, JOINT_NAME_MAP, type PredictionResult } from '../lib/prediction'
+import { predictRecovery, JOINT_NAME_MAP, JOINT_API_MAP, type PredictionResult } from '../lib/prediction'
 
 interface Props {
   sessions: Session[]
@@ -17,15 +17,15 @@ function groupByJoint(sessions: Session[]): Map<string, Session[]> {
   return map
 }
 
-function sisaHariInfo(sisaHari: number): { label: string; sub: string; color: string } {
-  if (sisaHari <= 0) return {
-    label: `${Math.abs(sisaHari)} hari`,
-    sub: 'melewati estimasi — terus latihan!',
+function sisaSesiInfo(sisaSesi: number): { label: string; sub: string; color: string } {
+  if (sisaSesi <= 0) return {
+    label: 'Target tercapai!',
+    sub: 'terus latihan untuk pemulihan penuh',
     color: 'text-green-600'
   }
-  if (sisaHari <= 14) return { label: `${sisaHari} hari`, sub: 'lagi dari sekarang', color: 'text-green-600' }
-  if (sisaHari <= 30) return { label: `${sisaHari} hari`, sub: 'lagi dari sekarang', color: 'text-amber-500' }
-  return { label: `${sisaHari} hari`, sub: 'lagi dari sekarang', color: 'text-primary-700' }
+  if (sisaSesi <= 5)  return { label: `${sisaSesi} sesi`, sub: 'lagi untuk pulih', color: 'text-green-600' }
+  if (sisaSesi <= 20) return { label: `${sisaSesi} sesi`, sub: 'lagi untuk pulih', color: 'text-amber-500' }
+  return { label: `${sisaSesi} sesi`, sub: 'lagi untuk pulih', color: 'text-primary-700' }
 }
 
 export default function RecoveryPredictionCard({ sessions, patient }: Props) {
@@ -36,7 +36,6 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
 
   const [selectedJoint, setSelectedJoint] = useState(joints[0] ?? '')
   const [result, setResult] = useState<PredictionResult | null>(null)
-  const [hariOnsetSaatIni, setHariOnsetSaatIni] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -62,12 +61,10 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
         usia: patient.age,
         jenis_stroke: patient.strokeType,
         hari_onset: hariOnset,
-        skor_konsentrasi: 0.78, // gunakan nilai mean training agar tidak bias
-        jenis_sendi: JOINT_NAME_MAP[selectedJoint] ?? selectedJoint,
+        jenis_sendi: JOINT_API_MAP[selectedJoint] ?? selectedJoint,
         rom_history: romHistory,
       })
       setResult(res)
-      setHariOnsetSaatIni(hariOnset)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Gagal terhubung ke server prediksi')
     }
@@ -79,11 +76,8 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
   const jointLabel = JOINT_NAME_MAP[selectedJoint] ?? selectedJoint
   const sessionCount = jointGroups.get(selectedJoint)?.length ?? 0
 
-  const sisaHari = result ? result.prediksi.median_hari - hariOnsetSaatIni : 0
-  const sisaCI = result
-    ? { low: result.prediksi.ci_95_lower - hariOnsetSaatIni, high: result.prediksi.ci_95_upper - hariOnsetSaatIni }
-    : null
-  const sisaInfo = result ? sisaHariInfo(sisaHari) : null
+  const sisaSesi = result ? result.prediksi.sisa_sesi_dibutuhkan : 0
+  const sisaInfo = result ? sisaSesiInfo(sisaSesi) : null
 
   return (
     <div className="card border-primary-100 bg-gradient-to-br from-primary-50/50 to-blue-50/30">
@@ -124,40 +118,40 @@ export default function RecoveryPredictionCard({ sessions, patient }: Props) {
             </div>
           )}
 
-          {result && sisaCI && sisaInfo && (
+          {result && sisaInfo && (
             <div className="bg-white rounded-xl p-4 mb-3 border border-primary-100 space-y-3">
-              {/* Sisa hari — metrik utama */}
+              {/* Sisa sesi — metrik utama */}
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1.5 mb-1">
                   <CalendarClock size={13} className="text-primary-600" />
-                  <p className="text-xs font-semibold text-slate-500">Estimasi Waktu Pulih · {jointLabel}</p>
+                  <p className="text-xs font-semibold text-slate-500">Perkiraan Sesi Pulih · {jointLabel}</p>
                 </div>
                 <p className={`text-4xl font-black leading-none ${sisaInfo.color}`}>
                   {sisaInfo.label}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">{sisaInfo.sub}</p>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Perkiraan: {sisaCI.low} sampai {sisaCI.high} hari
+                  Perkiraan: sesi ke-{result.prediksi.ci_95_lower} sampai {result.prediksi.ci_95_upper}
                 </p>
               </div>
 
-              {/* Dari onset stroke */}
+              {/* Grid info sesi */}
               <div className="border-t border-slate-50 pt-3 grid grid-cols-2 gap-2">
                 <div className="bg-slate-50 rounded-lg p-2.5 text-center">
                   <div className="flex items-center justify-center gap-1 mb-0.5">
                     <Clock size={11} className="text-slate-400" />
-                    <p className="text-[10px] text-slate-400">Target hari ke-</p>
+                    <p className="text-[10px] text-slate-400">Diprediksi pulih</p>
                   </div>
-                  <p className="text-lg font-black text-primary-700">{result.prediksi.median_hari}</p>
-                  <p className="text-[10px] text-slate-400">dari onset stroke</p>
+                  <p className="text-lg font-black text-primary-700">sesi {result.prediksi.median_sesi_pulih}</p>
+                  <p className="text-[10px] text-slate-400">dari awal latihan</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-2.5 text-center">
                   <div className="flex items-center justify-center gap-1 mb-0.5">
                     <Clock size={11} className="text-slate-400" />
-                    <p className="text-[10px] text-slate-400">Sudah berjalan</p>
+                    <p className="text-[10px] text-slate-400">Sudah selesai</p>
                   </div>
-                  <p className="text-lg font-black text-slate-600">{hariOnsetSaatIni}</p>
-                  <p className="text-[10px] text-slate-400">hari sejak stroke</p>
+                  <p className="text-lg font-black text-slate-600">{result.input_sesi}</p>
+                  <p className="text-[10px] text-slate-400">sesi latihan</p>
                 </div>
               </div>
 

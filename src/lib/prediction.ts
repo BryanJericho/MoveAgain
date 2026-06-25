@@ -1,5 +1,6 @@
 const PREDICTION_API_URL = import.meta.env.VITE_PREDICTION_API_URL ?? 'http://localhost:8000'
 
+// Label tampilan untuk user (Indonesia)
 export const JOINT_NAME_MAP: Record<string, string> = {
   elbow_right: 'Siku',
   elbow_left: 'Siku',
@@ -17,14 +18,33 @@ export const JOINT_NAME_MAP: Record<string, string> = {
   index_mcp: 'Jari',
 }
 
+// Nama sendi untuk API — harus exact match dengan levels_sendi di model R
+export const JOINT_API_MAP: Record<string, string> = {
+  elbow_right:    'Elbow_Flexion',
+  elbow_left:     'Elbow_Flexion',
+  shoulder_right: 'Shoulder_Abduction',
+  shoulder_left:  'Shoulder_Abduction',
+  knee_right:     'Knee_Flexion',
+  knee_left:      'Knee_Flexion',
+  ankle_right:    'Ankle_Dorsiflexion',
+  ankle_left:     'Ankle_Dorsiflexion',
+  index_pip:      'PIP_Index_Flexion',
+  middle_pip:     'PIP_Middle_Flexion',
+  ring_pip:       'PIP_Ring_Flexion',
+  pinky_pip:      'PIP_Little_Flexion',
+  thumb_ip:       'IP_Thumb_Flexion',
+  index_mcp:      'MCP_Index_Flexion',
+}
+
 export interface PredictionResult {
   status: string
   input_sesi: number
   prediksi: {
-    median_hari: number
+    median_sesi_pulih: number
     ci_95_lower: number
     ci_95_upper: number
-    probabilitas_90_hari_persen: number
+    sisa_sesi_dibutuhkan: number
+    probabilitas_pulih_persen: number
   }
   pesan: string
 }
@@ -33,7 +53,6 @@ export async function predictRecovery(params: {
   usia: number
   jenis_stroke: 'Hemoragik' | 'Iskemik'
   hari_onset: number
-  skor_konsentrasi: number
   jenis_sendi: string
   rom_history: number[]
 }): Promise<PredictionResult> {
