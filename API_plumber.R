@@ -10,6 +10,19 @@
 library(plumber)
 library(fda)
 
+#* @filter cors
+function(req, res) {
+  res$setHeader("Access-Control-Allow-Origin", "*")
+  res$setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+  res$setHeader("Access-Control-Allow-Headers", "Accept, Content-Type")
+  if (req$REQUEST_METHOD == "OPTIONS") {
+    res$status <- 200
+    return(list())
+  } else {
+    plumber::forward()
+  }
+}
+
 # --- Load model data ---------------------------------------------------
 PROD_FILES <- file.exists("output/post_samp.rds") && file.exists("output/fpca_ref.rds")
 
