@@ -23,4 +23,5 @@ cat("   GET  http://0.0.0.0:8000/health\n")
 cat("   POST http://0.0.0.0:8000/predict\n")
 cat("========================================================\n")
 
-pr_run(pr, host = "0.0.0.0", port = 8000)
+port <- as.integer(Sys.getenv("PORT", unset = "8000"))
+pr_run(pr, host = "0.0.0.0", port = port)
