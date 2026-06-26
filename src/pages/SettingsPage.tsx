@@ -219,7 +219,7 @@ export default function SettingsPage() {
               ['Database', 'Penyimpanan Data'],
               ['Auth', 'Keamanan Akun'],
               ['Pose Engine', 'Pendeteksi Gerakan'],
-              ['AI Chatbot', 'Gemini 2.5 Flash'],
+              ['AI Chatbot', 'Stroke-RAG with Gemini'],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between">
                 <span className="text-slate-500">{k}</span>
