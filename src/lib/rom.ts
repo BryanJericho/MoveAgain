@@ -60,8 +60,8 @@ export interface RepResult {
   repCompleted: boolean
 }
 
-const MIN_AMPLITUDE = 8  // minimum degrees peak-to-valley to count as a rep
-const HYSTERESIS    = 4  // degrees of confirmed reversal before changing direction
+const MIN_AMPLITUDE = 15  // minimum degrees peak-to-valley to count as a rep
+const HYSTERESIS    = 5   // degrees of confirmed reversal before changing direction
 
 export function updateRepState(angle: number, state: RepState): RepResult {
   const { phase, localPeak, localValley } = state
@@ -75,8 +75,8 @@ export function updateRepState(angle: number, state: RepState): RepResult {
       return { newState: { phase: 'rising', localPeak: angle, localValley }, repCompleted: false }
     }
     if (angle <= localPeak - HYSTERESIS) {
-      const repCompleted = (localPeak - localValley) >= MIN_AMPLITUDE
-      return { newState: { phase: 'falling', localPeak, localValley: angle }, repCompleted }
+      // Mulai turun — belum hitung rep, tunggu sampai kembali ke posisi awal
+      return { newState: { phase: 'falling', localPeak, localValley: angle }, repCompleted: false }
     }
     return { newState: state, repCompleted: false }
   }
@@ -86,7 +86,9 @@ export function updateRepState(angle: number, state: RepState): RepResult {
     return { newState: { phase: 'falling', localPeak, localValley: angle }, repCompleted: false }
   }
   if (angle >= localValley + HYSTERESIS) {
-    return { newState: { phase: 'rising', localPeak: angle, localValley }, repCompleted: false }
+    // Kembali ke posisi awal — rep selesai, hitung sekarang
+    const repCompleted = (localPeak - localValley) >= MIN_AMPLITUDE
+    return { newState: { phase: 'rising', localPeak: angle, localValley }, repCompleted }
   }
   return { newState: state, repCompleted: false }
 }
