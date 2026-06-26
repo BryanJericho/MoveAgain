@@ -9,6 +9,13 @@ interface Props {
   loading?: boolean
 }
 
+const LOADING_STAGES = [
+  { at: 0,  text: 'Menyiapkan model…' },
+  { at: 4,  text: 'Mengunduh model (~15 MB)…' },
+  { at: 12, text: 'Hampir siap…' },
+  { at: 20, text: 'Masih proses, tunggu ya…' },
+]
+
 interface Geometry {
   ax: number; ay: number
   bx: number; by: number
@@ -208,6 +215,71 @@ function JointDiagram({ exercise }: { exercise: ExerciseConfig }) {
   )
 }
 
+// ── Model loading status bar ────────────────────────────────────────
+function ModelStatusBar({ loading }: { loading?: boolean }) {
+  const [elapsed, setElapsed] = useState(0)
+  const [justReady, setJustReady] = useState(false)
+  const prevLoading = useRef(loading)
+
+  useEffect(() => {
+    if (!loading) { setElapsed(0); return }
+    const t = setInterval(() => setElapsed(s => s + 1), 1000)
+    return () => clearInterval(t)
+  }, [loading])
+
+  // Detect transition: loading → done → flash green for 2.5s
+  useEffect(() => {
+    if (prevLoading.current === true && loading === false) {
+      setJustReady(true)
+      const t = setTimeout(() => setJustReady(false), 2500)
+      prevLoading.current = false
+      return () => clearTimeout(t)
+    }
+    prevLoading.current = loading
+  }, [loading])
+
+  if (!loading && !justReady) return null
+
+  const pct = loading ? Math.min(90, (elapsed / 25) * 100) : 100
+  const stage = [...LOADING_STAGES].reverse().find(s => elapsed >= s.at) ?? LOADING_STAGES[0]
+
+  if (justReady && !loading) {
+    return (
+      <div className="mx-4 mb-3 rounded-2xl bg-green-500 px-4 py-3 flex items-center gap-3 animate-pulse-once">
+        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+          <CheckCircle2 size={18} color="white" />
+        </div>
+        <div className="flex-1">
+          <p className="text-white text-sm font-bold">Model siap!</p>
+          <p className="text-white/80 text-xs">Kamera dapat dibuka sekarang</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-4 mb-3 rounded-2xl bg-primary-700 px-4 py-3">
+      <div className="flex items-center gap-3 mb-2.5">
+        <div className="w-8 h-8 bg-white/15 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+        </div>
+        <div className="flex-1">
+          <p className="text-white text-sm font-bold">{stage.text}</p>
+          <p className="text-white/60 text-xs">Pertama kali butuh unduh ~15 MB</p>
+        </div>
+        <span className="text-white/50 text-xs tabular-nums">{elapsed}s</span>
+      </div>
+      {/* Progress bar */}
+      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-white rounded-full transition-all duration-1000 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ──────────────────────────────────────────────────
 export default function ExerciseGuide({ exercise, onStart, onBack, loading }: Props) {
   return (
@@ -306,16 +378,28 @@ export default function ExerciseGuide({ exercise, onStart, onBack, loading }: Pr
       </div>
 
       {/* Start button */}
-      <div className="px-4 pb-20 pt-3 bg-white border-t border-slate-100 flex-shrink-0">
-        <button
-          className="btn-primary w-full flex items-center justify-center gap-2 text-base"
-          onClick={onStart}
-          disabled={loading}
-        >
-          {loading
-            ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Memuat model…</>
-            : '📷 Saya Siap — Mulai Latihan'}
-        </button>
+      <div className="pt-3 pb-20 bg-white border-t border-slate-100 flex-shrink-0">
+        <ModelStatusBar loading={loading} />
+        <div className="px-4">
+          <button
+            className={`w-full flex items-center justify-center gap-2 text-base rounded-2xl py-4 font-bold transition-all duration-300 ${
+              loading
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'btn-primary shadow-lg shadow-primary-200 active:scale-[0.98]'
+            }`}
+            onClick={onStart}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin" />
+                Tunggu, model sedang dimuat…
+              </>
+            ) : (
+              '📷  Saya Siap — Mulai Latihan'
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )

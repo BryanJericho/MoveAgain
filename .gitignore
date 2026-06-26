@@ -10,3 +10,6 @@ output/survival_weibull_fit.rds
 .env
 .env.local
 .env.*.local
+
+# Firebase service account key
+serviceAccountKey*.json
